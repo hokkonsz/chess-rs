@@ -1,0 +1,19 @@
+[package]
+name = "chess"
+version = "0.1.0"
+edition = "2021"
+repository = "https://github.com/hokkonsz/chess-rs"
+license = "MIT"
+publish = false
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+eframe = {version = "0.20", optional = true}
+egui_extras = {version = "0.20", features = ["svg"], optional = true}
+
+
+[features]
+default = ["egui"]
+egui = ["eframe", "egui_extras"]

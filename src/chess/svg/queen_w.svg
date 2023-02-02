@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="14mm"
+   height="14mm"
+   viewBox="0 0 14 14"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="queen_w.svg"
+   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     id="namedview43"
+     showgrid="false"
+     inkscape:zoom="16.252976"
+     inkscape:cx="26.456693"
+     inkscape:cy="26.456693"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8"
+     inkscape:document-rotation="0" />
+  <defs
+     id="defs2">
+    <rect
+       x="-48.910324"
+       y="-33.007786"
+       width="80.715401"
+       height="52.785732"
+       id="rect843" />
+    <rect
+       x="1.984375"
+       y="0.8504464"
+       width="26.836309"
+       height="23.906994"
+       id="rect837" />
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer7"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.617px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340426"
+       x="0.19149223"
+       y="14.084257"
+       id="text869"><tspan
+         id="tspan867"
+         x="0.19149223"
+         y="14.084257"
+         style="stroke-width:0.340426">o</tspan></text>
+  </g>
+  <g
+     id="layer8"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.617px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340426"
+       x="0.19149223"
+       y="14.084067"
+       id="text865"><tspan
+         id="tspan863"
+         x="0.19149223"
+         y="14.084067"
+         style="stroke-width:0.340426">t</tspan></text>
+  </g>
+  <g
+     id="layer13"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.6171px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340429"
+       x="0.19149357"
+       y="14.084187"
+       id="text897"><tspan
+         id="tspan895"
+         x="0.19149357"
+         y="14.084187"
+         style="stroke-width:0.340429">m</tspan></text>
+  </g>
+  <g
+     id="layer10"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.6171px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340429"
+       x="0.19149411"
+       y="14.078116"
+       id="text885"><tspan
+         id="tspan883"
+         x="0.19149411"
+         y="14.078116"
+         style="stroke-width:0.340429">v</tspan></text>
+  </g>
+  <g
+     id="layer2"
+     style="display:inline;fill:#e3dedb">
+    <g
+       aria-label="w"
+       id="text857"
+       style="font-size:13.617px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340426;fill:#e3dedb">
+      <path
+         d="m 6.999992,0.8199996 q 0.5651587,0 0.5651587,0.5651587 0,0.5651587 -0.5651587,0.5651587 -0.5651586,0 -0.5651586,-0.5651587 0,-0.5651587 0.5651586,-0.5651587 z M 3.1768598,2.7215923 q 0.2194146,0.3989356 1.0039878,0.7114351 0.7845732,0.3058505 0.7845732,0.7912221 0,-0.4853716 0.9042539,-1.1502641 Q 6.7805775,2.4024439 6.999992,1.9968594 7.2194066,2.4024439 8.1369583,3.0739854 9.0545101,3.7388779 9.0345633,4.2242495 9.0079676,3.7388779 9.7858919,3.4330274 10.570465,3.1205279 10.829773,2.7016455 v 1.881646 Q 10.610359,4.988876 9.7991897,5.4210561 8.9946697,5.8465874 9.0146165,6.3319589 9.0345633,5.8465874 8.1236605,5.2415351 7.2194066,4.629834 6.999992,4.2242495 6.7805775,4.629834 5.8763236,5.2415351 4.9787187,5.8465874 4.9787187,6.3319589 q 0,-0.4853715 -0.7978711,-0.9109028 Q 3.3896254,4.988876 3.1702109,4.5832915 Z M 3.0904238,1.5247857 q 0.5651587,0 0.5651587,0.5651587 0,0.5651587 -0.5651587,0.5651587 -0.5651587,0 -0.5651587,-0.5651587 0,-0.5651587 0.5651587,-0.5651587 z m 7.7659452,-0.019947 q 0.565159,0 0.565159,0.5718076 0,0.5651587 -0.565159,0.5651587 -0.565159,0 -0.565159,-0.5651587 0,-0.5718076 0.565159,-0.5718076 z M 9.0412122,9.7761024 q 0,0.4521266 0.4521269,0.4521266 h 0.5651589 q 0.565158,0 0.565158,0.565159 v 0 q 0,0.571808 -0.565158,0.571808 H 3.9414863 q -0.5718076,0 -0.5718076,-0.571808 v 0 q 0,-0.565159 0.5718076,-0.565159 h 0.5651586 q 0.4454781,0 0.4454781,-0.4521266 V 8.1870092 H 9.0412122 Z M 4.2805815,6.5979159 h 5.44547 q 0.5718075,0 0.5718075,0.5651587 v 0 q 0,0.5718076 -0.5718075,0.5718076 h -5.44547 q -0.5651587,0 -0.5651587,-0.5718076 v 0 q 0,-0.5651587 0.5651587,-0.5651587 z M 2.6848393,11.817323 h 8.6303057 q 0.684839,0 0.684839,0.67819 v 0 q 0,0.684839 -0.684839,0.684839 H 2.6848393 Q 2,13.180352 2,12.495513 v 0 q 0,-0.67819 0.6848393,-0.67819 z"
+         style="stroke-width:0.340426;fill:#e3dedb"
+         id="path45" />
+    </g>
+  </g>
+  <g
+     id="layer4"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.617px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340426"
+       x="0.1914892"
+       y="14.084044"
+       id="text881"><tspan
+         id="tspan879"
+         x="0.1914892"
+         y="14.084044"
+         style="stroke-width:0.340426">l</tspan></text>
+  </g>
+  <g
+     id="layer12"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.617px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340426"
+       x="0.19149218"
+       y="14.084256"
+       id="text873"><tspan
+         id="tspan871"
+         x="0.19149218"
+         y="14.084256"
+         style="stroke-width:0.340426">p</tspan></text>
+  </g>
+  <g
+     id="layer9"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.6171px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340429"
+       x="0.19149394"
+       y="14.084144"
+       id="text861"><tspan
+         id="tspan859"
+         x="0.19149394"
+         y="14.084144"
+         style="stroke-width:0.340429">r</tspan></text>
+  </g>
+  <g
+     id="layer5"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.6171px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340429"
+       x="0.19149421"
+       y="14.08422"
+       id="text893"><tspan
+         id="tspan891"
+         x="0.19149421"
+         y="14.08422"
+         style="stroke-width:0.340429">n</tspan></text>
+  </g>
+  <g
+     id="layer11"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.617px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340426"
+       x="0.19149224"
+       y="14.084671"
+       id="text889"><tspan
+         id="tspan887"
+         x="0.19149224"
+         y="14.084671"
+         style="stroke-width:0.340426">b</tspan></text>
+  </g>
+  <g
+     id="layer3"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.6168px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340421"
+       x="0.1914895"
+       y="14.084429"
+       id="text853"
+       transform="scale(1.0000143,0.99998572)"><tspan
+         id="tspan851"
+         x="0.1914895"
+         y="14.084429"
+         style="stroke-width:0.340421">q</tspan></text>
+  </g>
+  <g
+     id="layer6"
+     style="display:none">
+    <text
+       xml:space="preserve"
+       style="font-size:13.6171px;line-height:1.25;font-family:'Chess Marroquin';-inkscape-font-specification:'Chess Marroquin';letter-spacing:0px;display:inline;stroke-width:0.340429"
+       x="0.19149394"
+       y="14.084145"
+       id="text877"><tspan
+         id="tspan875"
+         x="0.19149394"
+         y="14.084145"
+         style="stroke-width:0.340429">k</tspan></text>
+  </g>
+</svg>
