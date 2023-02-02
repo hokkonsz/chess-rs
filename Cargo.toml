@@ -12,8 +12,14 @@ publish = false
 [dependencies]
 eframe = {version = "0.20", optional = true}
 egui_extras = {version = "0.20", features = ["svg"], optional = true}
+notan = { version = "0.9", optional = true}
+slint = {version = "0.3", optional = true}
+macroquad = {version = "0.3", optional = true}
 
 
 [features]
-default = ["egui"]
-egui = ["eframe", "egui_extras"]
+default = ["notan"]
+egui = ["dep:eframe", "dep:egui_extras"]
+notan = ["dep:notan"]
+slint = ["dep:slint"]
+macroquad = ["dep:macroquad"]

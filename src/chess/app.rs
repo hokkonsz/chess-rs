@@ -14,23 +14,27 @@ use egui_extras::image::FitTo;
 #[cfg(feature = "egui")]
 use egui_extras::RetainedImage;
 
+// notan crates
+#[cfg(feature = "notan")]
+use notan::prelude::*;
+
 const UNIT_COUNT: usize = 12;
 
 //==================================================
 //=== Application using eGUI
 //==================================================
 #[cfg(feature = "egui")]
-pub struct ChessApp {
+pub struct ChessEguiApp {
     chess: Chess,
     img_buffer: Vec<RetainedImage>,
 }
 
 #[cfg(feature = "egui")]
-impl ChessApp {
+impl ChessEguiApp {
     pub fn new() -> Self {
         Self {
             chess: Chess::new(),
-            img_buffer: ChessApp::load_img_buffer(),
+            img_buffer: ChessEguiApp::load_img_buffer(),
         }
     }
 
@@ -40,7 +44,11 @@ impl ChessApp {
         let mut options = NativeOptions::default();
         options.centered = true;
 
-        eframe::run_native("Chess", options, Box::new(|_cc| Box::new(ChessApp::new())))
+        eframe::run_native(
+            "Chess",
+            options,
+            Box::new(|_cc| Box::new(ChessEguiApp::new())),
+        )
     }
 
     /// Used to load the SVG images into `img_buffer` in [`ChessApp`]
@@ -86,7 +94,7 @@ impl ChessApp {
     }
 }
 #[cfg(feature = "egui")]
-impl App for ChessApp {
+impl App for ChessEguiApp {
     fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
         egui::Area::new("Headline")
             .anchor(egui::Align2::CENTER_TOP, [0.0, 0.0])
@@ -154,5 +162,25 @@ impl App for ChessApp {
         self.chess.background_logic();
 
         egui::CentralPanel::default().show(ctx, |_ui| {});
+    }
+}
+
+//==================================================
+//=== Application using notan
+//==================================================
+
+#[cfg(feature = "notan")]
+pub struct ChessNotanApp {
+    chess: Chess,
+}
+
+impl ChessNotanApp {
+    pub fn run() -> Result<(), String> {
+        let win = WindowConfig::default()
+            .size(1024, 860)
+            .high_dpi(true)
+            .lazy_loop(true);
+
+        notan::init().add_config(win).build()
     }
 }

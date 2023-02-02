@@ -1,9 +1,16 @@
-#![allow(dead_code)]
-
 mod chess;
 
-use chess::app::ChessApp;
+#[cfg(feature = "egui")]
+use chess::app::ChessEguiApp;
+#[cfg(feature = "notan")]
+use chess::app::ChessNotanApp;
 
+#[cfg(feature = "egui")]
 fn main() {
-    ChessApp::run()
+    ChessEguiApp::run()
+}
+
+#[cfg(feature = "notan")]
+fn main() {
+    ChessNotanApp::run().unwrap();
 }
