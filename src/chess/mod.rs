@@ -1,5 +1,5 @@
 mod board;
-mod chess;
+mod game;
 mod pos;
 mod unit;
 

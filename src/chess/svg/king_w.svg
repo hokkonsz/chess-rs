@@ -13,7 +13,10 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="king_w.svg"
-   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)">
+   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"
+   inkscape:export-filename="C:\Gep\Programming\Rust\_git_self\chess-rs\src\chess\png\king_w.png"
+   inkscape:export-xdpi="297"
+   inkscape:export-ydpi="297">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -27,9 +30,9 @@
      inkscape:window-height="1027"
      id="namedview43"
      showgrid="false"
-     inkscape:zoom="11.49259"
-     inkscape:cx="30.279503"
-     inkscape:cy="30.075619"
+     inkscape:zoom="5.746295"
+     inkscape:cx="54.28005"
+     inkscape:cy="61.272595"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"

@@ -1,40 +1,29 @@
-use crate::chess::unit::Side;
-
 // chess crate
-use super::chess::Chess;
-use super::unit::Unit;
+use crate::chess::game::Chess;
+use crate::chess::unit::{Side, Unit};
 
 // egui crates
-#[cfg(feature = "egui")]
 use eframe::egui::{Color32, Response, RichText};
-#[cfg(feature = "egui")]
 use eframe::{egui, App, NativeOptions};
-#[cfg(feature = "egui")]
 use egui_extras::image::FitTo;
-#[cfg(feature = "egui")]
 use egui_extras::RetainedImage;
-
-// notan crates
-#[cfg(feature = "notan")]
-use notan::prelude::*;
 
 const UNIT_COUNT: usize = 12;
 
 //==================================================
 //=== Application using eGUI
 //==================================================
-#[cfg(feature = "egui")]
+
 pub struct ChessEguiApp {
     chess: Chess,
     img_buffer: Vec<RetainedImage>,
 }
 
-#[cfg(feature = "egui")]
 impl ChessEguiApp {
     pub fn new() -> Self {
         Self {
             chess: Chess::new(),
-            img_buffer: ChessEguiApp::load_img_buffer(),
+            img_buffer: ChessEguiApp::init(),
         }
     }
 
@@ -52,7 +41,7 @@ impl ChessEguiApp {
     }
 
     /// Used to load the SVG images into `img_buffer` in [`ChessApp`]
-    fn load_img_buffer() -> Vec<RetainedImage> {
+    fn init() -> Vec<RetainedImage> {
         let units: [Unit; UNIT_COUNT] = [
             Unit::Pawn(Side::Black),
             Unit::Bishop(Side::Black),
@@ -93,7 +82,6 @@ impl ChessEguiApp {
         img_buffer
     }
 }
-#[cfg(feature = "egui")]
 impl App for ChessEguiApp {
     fn update(&mut self, ctx: &eframe::egui::Context, _frame: &mut eframe::Frame) {
         egui::Area::new("Headline")
@@ -162,25 +150,5 @@ impl App for ChessEguiApp {
         self.chess.background_logic();
 
         egui::CentralPanel::default().show(ctx, |_ui| {});
-    }
-}
-
-//==================================================
-//=== Application using notan
-//==================================================
-
-#[cfg(feature = "notan")]
-pub struct ChessNotanApp {
-    chess: Chess,
-}
-
-impl ChessNotanApp {
-    pub fn run() -> Result<(), String> {
-        let win = WindowConfig::default()
-            .size(1024, 860)
-            .high_dpi(true)
-            .lazy_loop(true);
-
-        notan::init().add_config(win).build()
     }
 }

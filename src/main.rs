@@ -1,9 +1,11 @@
+#[allow(dead_code)]
+#[allow(unused_imports)]
 mod chess;
 
 #[cfg(feature = "egui")]
-use chess::app::ChessEguiApp;
+use chess::app::egui::ChessEguiApp;
 #[cfg(feature = "notan")]
-use chess::app::ChessNotanApp;
+use chess::app::notan::ChessState;
 
 #[cfg(feature = "egui")]
 fn main() {
@@ -11,6 +13,6 @@ fn main() {
 }
 
 #[cfg(feature = "notan")]
-fn main() {
-    ChessNotanApp::run().unwrap();
+fn main() -> Result<(), String> {
+    ChessState::run()
 }
