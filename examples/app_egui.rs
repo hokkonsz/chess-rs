@@ -1,6 +1,7 @@
 // chess crate
-use crate::chess::game::Chess;
-use crate::chess::unit::{Side, Unit};
+extern crate chess;
+use chess::game::Chess;
+use chess::unit::{Side, Unit};
 
 // egui crates
 use eframe::egui::{Color32, Response, RichText};
@@ -13,6 +14,10 @@ const UNIT_COUNT: usize = 12;
 //==================================================
 //=== Application using eGUI
 //==================================================
+
+fn main() {
+    ChessEguiApp::run()
+}
 
 pub struct ChessEguiApp {
     chess: Chess,
@@ -62,15 +67,14 @@ impl ChessEguiApp {
 
         for (i, unit) in units.into_iter().enumerate() {
             let debug_name = format!("{}", unit.get_id_str());
-            let path = format!(
-                "C:/Gep/Programming/Rust/test/chess/src/chess/svg/{}.svg",
-                unit.get_id_str()
-            );
+            let path = format!("res/svg/{}.svg", unit.get_id_str());
 
             img_buffer.push(
                 egui_extras::image::RetainedImage::from_svg_bytes_with_size(
                     debug_name,
-                    std::fs::read(path).unwrap().as_slice(),
+                    std::fs::read(std::path::Path::new(&path))
+                        .unwrap()
+                        .as_slice(),
                     FitTo::Size(50, 50),
                 )
                 .unwrap(),

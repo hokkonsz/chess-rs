@@ -23,3 +23,11 @@ egui = ["dep:eframe", "dep:egui_extras"]
 notan = ["dep:notan"]
 slint = ["dep:slint"]
 macroquad = ["dep:macroquad"]
+
+[[example]]
+name = "app_egui"
+required-features = ["egui"]
+
+[[example]]
+name = "app_notan"
+required-features = ["notan"]
