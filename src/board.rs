@@ -1,7 +1,9 @@
-// chess crate
+// Chess Crate
 use super::pos::Pos;
-use super::unit::{Side, Unit};
+use super::side::Side;
+use super::unit::Unit;
 
+// CHESS
 const BOARD_SIZE: usize = 8;
 
 //==================================================
@@ -29,23 +31,27 @@ impl Board {
     }
 
     /// Mutates [`Board`] when called with a viable move
-    pub fn move_unit(&mut self, unit_pos: Pos, target_pos: Pos) {
+    pub fn move_unit(&mut self, unit_pos: Pos, target_pos: Pos) -> bool {
         match (self.get_unit(unit_pos), self.get_unit(target_pos)) {
             (Some(selected_unit), target_unit) => {
-                if selected_unit.try_move(&unit_pos, &target_pos) {
+                let try_move = selected_unit.try_move(&unit_pos, &target_pos);
+
+                if try_move.valid {
                     if let Some(target_unit) = target_unit {
                         if target_unit.get_side() == selected_unit.get_side() {
                             println!("Can't take your own units!");
-                            return;
+                            return false;
                         }
                     }
 
                     self.set_unit(selected_unit, target_pos);
                     self.remove_unit(unit_pos);
                 }
+                true
             }
-            (None, _) => {
+            _ => {
                 println!("Can't move with an empty field!");
+                false
             }
         }
     }
@@ -58,44 +64,44 @@ impl Default for Board {
         };
 
         // Black Back Row
-        board.set_unit(Unit::Rook(Side::Black), "A8".into());
+        board.set_unit(Unit::Rook(Side::Black, false), "A8".into());
         board.set_unit(Unit::Knight(Side::Black), "B8".into());
         board.set_unit(Unit::Bishop(Side::Black), "C8".into());
         board.set_unit(Unit::Queen(Side::Black), "D8".into());
-        board.set_unit(Unit::King(Side::Black), "E8".into());
+        board.set_unit(Unit::King(Side::Black, false), "E8".into());
         board.set_unit(Unit::Bishop(Side::Black), "F8".into());
         board.set_unit(Unit::Knight(Side::Black), "G8".into());
-        board.set_unit(Unit::Rook(Side::Black), "H8".into());
+        board.set_unit(Unit::Rook(Side::Black, false), "H8".into());
 
         // Black Front Row
-        board.set_unit(Unit::Pawn(Side::Black), "A7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "B7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "C7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "D7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "E7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "F7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "G7".into());
-        board.set_unit(Unit::Pawn(Side::Black), "H7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "A7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "B7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "C7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "D7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "E7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "F7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "G7".into());
+        board.set_unit(Unit::Pawn(Side::Black, false), "H7".into());
 
         // White Back Row
-        board.set_unit(Unit::Rook(Side::White), "A1".into());
+        board.set_unit(Unit::Rook(Side::White, false), "A1".into());
         board.set_unit(Unit::Knight(Side::White), "B1".into());
         board.set_unit(Unit::Bishop(Side::White), "C1".into());
         board.set_unit(Unit::Queen(Side::White), "D1".into());
-        board.set_unit(Unit::King(Side::White), "E1".into());
+        board.set_unit(Unit::King(Side::White, false), "E1".into());
         board.set_unit(Unit::Bishop(Side::White), "F1".into());
         board.set_unit(Unit::Knight(Side::White), "G1".into());
-        board.set_unit(Unit::Rook(Side::White), "H1".into());
+        board.set_unit(Unit::Rook(Side::White, false), "H1".into());
 
         // Black Front Row
-        board.set_unit(Unit::Pawn(Side::White), "A2".into());
-        board.set_unit(Unit::Pawn(Side::White), "B2".into());
-        board.set_unit(Unit::Pawn(Side::White), "C2".into());
-        board.set_unit(Unit::Pawn(Side::White), "D2".into());
-        board.set_unit(Unit::Pawn(Side::White), "E2".into());
-        board.set_unit(Unit::Pawn(Side::White), "F2".into());
-        board.set_unit(Unit::Pawn(Side::White), "G2".into());
-        board.set_unit(Unit::Pawn(Side::White), "H2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "A2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "B2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "C2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "D2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "E2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "F2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "G2".into());
+        board.set_unit(Unit::Pawn(Side::White, false), "H2".into());
 
         board
     }

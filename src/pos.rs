@@ -1,15 +1,54 @@
-// standard crate
+// Standard Crate
 use std::ops::{Add, Sub};
+
+// CHESS
+const BOARD_SIZE: usize = 8;
+
+// ASCII
+const LOWERCASE_A: usize = 97;
+const UPPERCASE_A: usize = 65;
+const DISTANCE: usize = LOWERCASE_A - UPPERCASE_A;
+const ZERO: usize = 48;
 
 //==================================================
 //=== Pos
 //==================================================
 
 /// Used to position units on the board
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Pos {
     pub x: usize,
     pub y: usize,
+}
+
+impl Pos {
+    pub fn up(&self) -> Self {
+        Self {
+            x: usize::clamp(self.x + 1, 0, 8),
+            y: self.y,
+        }
+    }
+
+    pub fn down(&self) -> Self {
+        Self {
+            x: usize::clamp(self.x - 1, 0, 8),
+            y: self.y,
+        }
+    }
+
+    pub fn right(&self) -> Self {
+        Self {
+            x: self.x,
+            y: usize::clamp(self.y + 1, 0, 8),
+        }
+    }
+
+    pub fn left(&self) -> Self {
+        Self {
+            x: self.x,
+            y: usize::clamp(self.y - 1, 0, 8),
+        }
+    }
 }
 
 /// Default [`Pos`]
@@ -51,14 +90,14 @@ impl From<&str> for Pos {
             let row = s.chars().nth(1).unwrap() as usize;
 
             // Lower ASCII Space -> Upper ASCII Space
-            if col > 96 {
-                col = col - 32;
+            if col > LOWERCASE_A {
+                col = col - DISTANCE;
             }
 
             // Chess Space -> Array Space
             Self {
-                x: (col - 64) - 1,
-                y: 8 - (row - 48),
+                x: col - UPPERCASE_A,
+                y: BOARD_SIZE - (row - ZERO),
             }
         }
     }

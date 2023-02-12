@@ -1,7 +1,7 @@
-// chess crate
+// Chess Crate
 use super::board::Board;
 use super::pos::Pos;
-use super::unit::Side;
+use super::side::Side;
 
 //==================================================
 //=== Chess
@@ -37,13 +37,18 @@ impl Chess {
                 if let Some(unit) = self.board_state.get_unit(unit_pos) {
                     if unit.get_side() != self.current_turn {
                         self.unit_pos = None;
-                        println!("Not your turn!")
+                        println!("Not your turn!");
                     }
-                };
+                } else {
+                    self.unit_pos = None;
+                    println!("Can't move with an empty square!");
+                }
             }
             (Some(unit_pos), Some(taget_pos)) => {
-                self.board_state.move_unit(unit_pos, taget_pos);
-                self.current_turn.swap();
+                if self.board_state.move_unit(unit_pos, taget_pos) {
+                    self.current_turn.swap();
+                    println!("{} moves next!", self.current_turn);
+                }
                 self.unit_pos = None;
                 self.target_pos = None;
             }
