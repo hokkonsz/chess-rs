@@ -16,7 +16,7 @@ pub struct Board {
 
 impl Board {
     /// Gives back the [`Unit`] on the given position
-    pub fn get_unit(&mut self, pos: Pos) -> Option<Unit> {
+    pub fn get_unit(&self, pos: Pos) -> Option<Unit> {
         self.square[pos.y][pos.x]
     }
 
@@ -104,5 +104,39 @@ impl Default for Board {
         board.set_unit(Unit::Pawn(Side::White, false), "H2".into());
 
         board
+    }
+}
+
+//==================================================
+//=== Unit Testing
+//==================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_no_condition() {
+        let test_board = Board::default();
+        for (y, row) in test_board.square.into_iter().enumerate() {
+            for (x, col) in row.into_iter().enumerate() {
+                if col.is_some() {
+                    print!("Row: {}, Col: {} = {}\n", y, x, col.unwrap().get_id_str());
+                } else {
+                    print!("Row: {}, Col: {} = Empty\n", y, x);
+                }
+            }
+        }
+
+        if let Some(unit) = test_board.get_unit("H8".into()) {
+            println!("H8 = {}", unit.get_id_str());
+        } else {
+            println!("H8 = Empty");
+        }
+
+        if let Some(unit) = test_board.get_unit("H1".into()) {
+            println!("H1 = {}", unit.get_id_str());
+        } else {
+            println!("H1 = Empty");
+        }
     }
 }

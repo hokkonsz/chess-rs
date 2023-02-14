@@ -22,38 +22,73 @@ pub struct Pos {
 }
 
 impl Pos {
+    /// E.g. D4 -> D5
     pub fn up(&self) -> Self {
         Self {
-            x: usize::clamp(self.x + 1, 0, 8),
-            y: self.y,
+            x: self.x,
+            y: usize::clamp(self.y - 1, 0, 8),
         }
     }
 
-    pub fn down(&self) -> Self {
+    /// E.g. D4 -> C5
+    pub fn up_left(&self) -> Self {
         Self {
             x: usize::clamp(self.x - 1, 0, 8),
-            y: self.y,
+            y: usize::clamp(self.y - 1, 0, 8),
         }
     }
 
-    pub fn right(&self) -> Self {
+    /// E.g. D4 -> E5
+    pub fn up_right(&self) -> Self {
+        Self {
+            x: usize::clamp(self.x + 1, 0, 8),
+            y: usize::clamp(self.y - 1, 0, 8),
+        }
+    }
+
+    /// E.g. D4 -> D3
+    pub fn down(&self) -> Self {
         Self {
             x: self.x,
             y: usize::clamp(self.y + 1, 0, 8),
         }
     }
 
-    pub fn left(&self) -> Self {
+    /// E.g. D4 -> C3
+    pub fn down_left(&self) -> Self {
         Self {
-            x: self.x,
-            y: usize::clamp(self.y - 1, 0, 8),
+            x: usize::clamp(self.x - 1, 0, 8),
+            y: usize::clamp(self.y + 1, 0, 8),
         }
     }
+
+    /// E.g. D4 -> E3
+    pub fn down_right(&self) -> Self {
+        Self {
+            x: usize::clamp(self.x + 1, 0, 8),
+            y: usize::clamp(self.y + 1, 0, 8),
+        }
+    }
+
+    /// E.g. D4 -> C4
+    pub fn left(&self) -> Self {
+        Self {
+            x: usize::clamp(self.x - 1, 0, 8),
+            y: self.y,
+        }
+    }
+
+    /// E.g. D4 -> E4
+    pub fn right(&self) -> Self {
+        Self {
+            x: usize::clamp(self.x + 1, 0, 8),
+            y: self.y,
+        }
+    }
+
+    // TODO! Methode that produces an iterator between two points!
 }
 
-/// Default [`Pos`]
-/// * `x` = 0
-/// * `y` = 0
 impl Default for Pos {
     fn default() -> Self {
         Self { x: 0, y: 0 }
@@ -109,5 +144,53 @@ impl From<(usize, usize)> for Pos {
             x: tuple.0,
             y: tuple.1,
         }
+    }
+}
+
+//==================================================
+//=== Unit Testing
+//==================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_up() {
+        assert_eq!(Pos::from("D5"), Pos::from("D4").up());
+    }
+
+    #[test]
+    fn test_up_left() {
+        assert_eq!(Pos::from("C5"), Pos::from("D4").up_left());
+    }
+
+    #[test]
+    fn test_up_right() {
+        assert_eq!(Pos::from("E5"), Pos::from("D4").up_right());
+    }
+
+    #[test]
+    fn test_down() {
+        assert_eq!(Pos::from("D3"), Pos::from("D4").down());
+    }
+
+    #[test]
+    fn test_down_left() {
+        assert_eq!(Pos::from("C3"), Pos::from("D4").down_left());
+    }
+
+    #[test]
+    fn test_down_right() {
+        assert_eq!(Pos::from("E3"), Pos::from("D4").down_right());
+    }
+
+    #[test]
+    fn test_left() {
+        assert_eq!(Pos::from("C4"), Pos::from("D4").left());
+    }
+
+    #[test]
+    fn test_right() {
+        assert_eq!(Pos::from("E4"), Pos::from("D4").right());
     }
 }

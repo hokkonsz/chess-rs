@@ -1,7 +1,7 @@
 // Chess Crate
-use super::move_result::MoveResult;
 use super::pos::Pos;
 use super::side::Side;
+use super::step::StepResult;
 
 // Standard Crate
 use std::fmt;
@@ -10,7 +10,7 @@ use std::fmt;
 //=== Unit
 //==================================================
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Unit {
     Pawn(Side, Moved),
     Bishop(Side),
@@ -90,7 +90,7 @@ impl Unit {
     }
 
     /// Gives back `true`, if the move is possible
-    pub fn try_move(&self, unit_pos: &Pos, target_pos: &Pos) -> MoveResult {
+    pub fn try_move(&self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
         let calc_pos = Pos {
             x: usize::max(target_pos.x, unit_pos.x) - usize::min(target_pos.x, unit_pos.x),
             y: usize::max(target_pos.y, unit_pos.y) - usize::min(target_pos.y, unit_pos.y),
@@ -114,8 +114,8 @@ impl Unit {
         calc_pos: &Pos,
         side: &Side,
         moved: &Moved,
-    ) -> MoveResult {
-        let mut move_result = MoveResult::failed();
+    ) -> StepResult {
+        let mut move_result = StepResult::invalid();
         let pos_offset: Pos;
 
         // Step Direction
@@ -167,8 +167,8 @@ impl Unit {
         move_result
     }
 
-    fn check_move_bishop(calc_pos: &Pos) -> MoveResult {
-        let mut move_result = MoveResult::failed();
+    fn check_move_bishop(calc_pos: &Pos) -> StepResult {
+        let mut move_result = StepResult::invalid();
 
         if calc_pos.x == calc_pos.y {
             move_result.valid = true;
@@ -179,8 +179,8 @@ impl Unit {
         move_result
     }
 
-    fn check_move_knight(calc_pos: &Pos) -> MoveResult {
-        let mut move_result = MoveResult::failed();
+    fn check_move_knight(calc_pos: &Pos) -> StepResult {
+        let mut move_result = StepResult::invalid();
 
         if (calc_pos.x == 1 && calc_pos.y == 2) || (calc_pos.x == 2 && calc_pos.y == 1) {
             move_result.valid = true;
@@ -189,8 +189,8 @@ impl Unit {
         move_result
     }
 
-    fn check_move_rook(calc_pos: &Pos) -> MoveResult {
-        let mut move_result = MoveResult::failed();
+    fn check_move_rook(calc_pos: &Pos) -> StepResult {
+        let mut move_result = StepResult::invalid();
 
         if calc_pos.x == 0 || calc_pos.y == 0 {
             move_result.valid = true;
@@ -201,8 +201,8 @@ impl Unit {
         move_result
     }
 
-    fn check_move_queen(calc_pos: &Pos) -> MoveResult {
-        let mut move_result = MoveResult::failed();
+    fn check_move_queen(calc_pos: &Pos) -> StepResult {
+        let mut move_result = StepResult::invalid();
 
         if calc_pos.x == 0 || calc_pos.y == 0 || calc_pos.x == calc_pos.y {
             move_result.valid = true;
@@ -213,8 +213,8 @@ impl Unit {
         move_result
     }
 
-    fn check_move_king(calc_pos: &Pos) -> MoveResult {
-        let mut move_result = MoveResult::failed();
+    fn check_move_king(calc_pos: &Pos) -> StepResult {
+        let mut move_result = StepResult::invalid();
 
         if calc_pos.x == 0 || calc_pos.y == 0 {
             move_result.valid = true;
@@ -245,5 +245,62 @@ impl fmt::Display for Unit {
             Unit::King(Side::White, _) => "♔",
         };
         write!(f, "{}", x.to_owned())
+    }
+}
+
+//==================================================
+//=== Unit Testing
+//==================================================
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_same_units1() {
+        assert_eq!(Unit::Knight(Side::Black), Unit::Knight(Side::Black));
+    }
+
+    #[test]
+    fn test_same_units2() {
+        assert_eq!(Unit::Rook(Side::Black, true), Unit::Rook(Side::Black, true));
+    }
+
+    #[test]
+    fn test_same_units3() {
+        assert_ne!(Unit::Knight(Side::Black), Unit::Knight(Side::White));
+    }
+
+    #[test]
+    fn test_same_units4() {
+        assert_ne!(
+            Unit::Pawn(Side::Black, false),
+            Unit::Pawn(Side::White, false)
+        );
+    }
+
+    #[test]
+    fn test_same_units5() {
+        assert_ne!(
+            Unit::Pawn(Side::Black, true),
+            Unit::Pawn(Side::Black, false)
+        );
+    }
+
+    #[test]
+    fn test_different_units1() {
+        assert_ne!(Unit::Pawn(Side::Black, true), Unit::Rook(Side::Black, true));
+    }
+
+    #[test]
+    fn test_different_units2() {
+        assert_ne!(Unit::Pawn(Side::White, true), Unit::Rook(Side::Black, true));
+    }
+
+    #[test]
+    fn test_different_units3() {
+        assert_ne!(
+            Unit::Pawn(Side::Black, false),
+            Unit::Rook(Side::Black, true)
+        );
     }
 }

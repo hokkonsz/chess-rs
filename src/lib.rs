@@ -1,8 +1,8 @@
 mod board;
 mod game;
-mod move_result;
 mod pos;
 mod side;
+mod step;
 mod unit;
 
 pub mod prelude {
