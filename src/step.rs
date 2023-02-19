@@ -1,5 +1,3 @@
-use std::ops::Not;
-
 // Chess Crate
 use super::board::Board;
 use super::pos::Pos;
@@ -13,7 +11,7 @@ use super::unit::Unit;
 pub struct StepResult {
     groups: usize,
     pub valid: bool,
-    pub conditions: Vec<Condition>,
+    conditions: Vec<Condition>,
 }
 
 impl StepResult {
@@ -351,8 +349,6 @@ mod tests {
 
         let test_board = Board::default();
         assert!(sr.evaluate(&test_board));
-        // dbg!(sr);
-        // println!("\n\n\n\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     }
 
     #[test]

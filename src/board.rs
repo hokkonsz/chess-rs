@@ -17,17 +17,29 @@ pub struct Board {
 impl Board {
     /// Gives back the [`Unit`] on the given position
     pub fn get_unit(&self, pos: Pos) -> Option<Unit> {
-        self.square[pos.y][pos.x]
+        if !pos.is_onboard() {
+            return None;
+        }
+
+        self.square[pos.y as usize][pos.x as usize]
     }
 
     /// Sets the [`Unit`] to the target position
     pub fn set_unit(&mut self, unit: Unit, pos: Pos) {
-        self.square[pos.y][pos.x] = Some(unit);
+        if !pos.is_onboard() {
+            return;
+        }
+
+        self.square[pos.y as usize][pos.x as usize] = Some(unit);
     }
 
     /// Removes a [`Unit`] from the [`Board`]
     pub fn remove_unit(&mut self, pos: Pos) {
-        self.square[pos.y][pos.x] = None;
+        if !pos.is_onboard() {
+            return;
+        }
+
+        self.square[pos.y as usize][pos.x as usize] = None;
     }
 
     /// Mutates [`Board`] when called with a viable move
@@ -36,7 +48,7 @@ impl Board {
             (Some(selected_unit), target_unit) => {
                 let try_move = selected_unit.try_move(&unit_pos, &target_pos);
 
-                if try_move.valid {
+                if try_move.evaluate(&self) {
                     if let Some(target_unit) = target_unit {
                         if target_unit.get_side() == selected_unit.get_side() {
                             println!("Can't take your own units!");

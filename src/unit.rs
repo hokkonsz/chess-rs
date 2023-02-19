@@ -91,11 +91,7 @@ impl Unit {
 
     /// Gives back `true`, if the move is possible
     pub fn try_move(&self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
-        let calc_pos = Pos {
-            x: usize::max(target_pos.x, unit_pos.x) - usize::min(target_pos.x, unit_pos.x),
-            y: usize::max(target_pos.y, unit_pos.y) - usize::min(target_pos.y, unit_pos.y),
-        };
-
+        let calc_pos = *target_pos - *unit_pos;
         match self {
             Self::Pawn(side, moved) => {
                 Self::check_move_pawn(&unit_pos, &target_pos, &calc_pos, &side, &moved)
