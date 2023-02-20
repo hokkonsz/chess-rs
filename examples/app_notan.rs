@@ -153,7 +153,7 @@ fn draw(gfx: &mut Graphics, state: &mut ChessState) {
             }
             // selected tile
             if let Some(pos) = state.chess.unit_pos {
-                if pos == (board_x as i32, board_y as i32).into() {
+                if pos == (board_x as i8, board_y as i8).into() {
                     draw.image(&state.texture_buffer[14]).position(x, y);
                 }
             }
@@ -194,8 +194,8 @@ fn mouse_to_pos((x, y): (f32, f32)) -> Option<Pos> {
         let y = (y - TOP) / (SQUARE_SIZE / 2.0);
 
         return Some(Pos {
-            x: x as i32,
-            y: y as i32,
+            x: x as i8,
+            y: y as i8,
         });
     }
     None

@@ -1,7 +1,8 @@
 // Chess Crate
 use super::pos::Pos;
 use super::side::Side;
-use super::unit::Unit;
+use super::unit::{Moved, Unit};
+use crate::step::StepResult;
 
 // CHESS
 const BOARD_SIZE: usize = 8;
@@ -16,9 +17,9 @@ pub struct Board {
 
 impl Board {
     /// Gives back the [`Unit`] on the given position
-    pub fn get_unit(&self, pos: Pos) -> Option<Unit> {
+    pub fn get_unit(&self, pos: &Pos) -> Option<Unit> {
         if !pos.is_onboard() {
-            return None;
+            panic!("Cant get unit on Pos: {} - Pos Not On Board", pos);
         }
 
         self.square[pos.y as usize][pos.x as usize]
@@ -27,45 +28,173 @@ impl Board {
     /// Sets the [`Unit`] to the target position
     pub fn set_unit(&mut self, unit: Unit, pos: Pos) {
         if !pos.is_onboard() {
-            return;
+            panic!("Cant set unit on Pos: {} - Pos Not On Board", pos);
         }
 
         self.square[pos.y as usize][pos.x as usize] = Some(unit);
     }
 
     /// Removes a [`Unit`] from the [`Board`]
-    pub fn remove_unit(&mut self, pos: Pos) {
+    pub fn remove_unit(&mut self, pos: &Pos) {
         if !pos.is_onboard() {
-            return;
+            panic!("Cant remove unit on Pos: {} - Pos Not On Board", pos);
         }
 
         self.square[pos.y as usize][pos.x as usize] = None;
     }
 
-    /// Mutates [`Board`] when called with a viable move
-    pub fn move_unit(&mut self, unit_pos: Pos, target_pos: Pos) -> bool {
-        match (self.get_unit(unit_pos), self.get_unit(target_pos)) {
-            (Some(selected_unit), target_unit) => {
-                let try_move = selected_unit.try_move(&unit_pos, &target_pos);
+    /// Mutates [`Board`] when called with a viable step
+    pub fn step_unit(&mut self, unit_pos: &Pos, target_pos: &Pos) -> bool {
+        let selected_unit = self.get_unit(unit_pos).unwrap();
+        let sr = match selected_unit {
+            Unit::Pawn(side, moved) => self.check_step_pawn(&unit_pos, &target_pos, &side, &moved),
+            Unit::Bishop(_) => self.check_step_bishop(&unit_pos, &target_pos),
+            Unit::Knight(_) => self.check_step_knight(&unit_pos, &target_pos),
+            Unit::Rook(_, _) => self.check_step_rook(&unit_pos, &target_pos),
+            Unit::Queen(_) => self.check_step_queen(&unit_pos, &target_pos),
+            Unit::King(side, moved) => self.check_step_king(&unit_pos, &target_pos, &side, &moved),
+        };
 
-                if try_move.evaluate(&self) {
-                    if let Some(target_unit) = target_unit {
-                        if target_unit.get_side() == selected_unit.get_side() {
-                            println!("Can't take your own units!");
-                            return false;
-                        }
-                    }
+        if !sr.evaluate(&self) {
+            return false;
+        }
 
-                    self.set_unit(selected_unit, target_pos);
-                    self.remove_unit(unit_pos);
-                }
-                true
+        // Step Unit
+        self.remove_unit(unit_pos);
+        self.set_unit(selected_unit, *target_pos);
+        true
+    }
+
+    fn check_step_pawn(
+        &mut self,
+        unit_pos: &Pos,
+        target_pos: &Pos,
+        side: &Side,
+        moved: &Moved,
+    ) -> StepResult {
+        let mut sr = StepResult::invalid();
+
+        let mut calc_pos = *target_pos - *unit_pos;
+        let offset_pos;
+
+        match side {
+            Side::Black if calc_pos.y > 0 => offset_pos = target_pos.up(),
+            Side::White if calc_pos.y < 0 => offset_pos = target_pos.down(),
+            _ => return sr,
+        };
+
+        // 1 Step E.g. D5 -> D4
+        // 2 Step E.g. D7 -> D6 OR D7 -> D5
+        calc_pos = calc_pos.abs();
+        println!("1: {}", calc_pos);
+        println!("2: {}", offset_pos);
+        if calc_pos.x == 0 {
+            // 1 Step
+            if calc_pos.y == 1 {
+                sr.valid = true;
             }
-            _ => {
-                println!("Can't move with an empty field!");
-                false
+            // 2 Step
+            else if calc_pos.y == 2 && !moved {
+                sr.valid = true;
+
+                sr.condition_empty(offset_pos);
             }
         }
+        // Capture E.g. D5 -> C4 OR D5 -> E4 [Condition Group ID: 0]
+        // En Passant E.g. D5 -> C4 OR D5 -> E4 [Condition Group ID: 1]
+        else if calc_pos.x == 1 && calc_pos.x == 1 {
+            sr.valid = true;
+
+            // Capture
+            sr.condition_any(*target_pos);
+
+            // En Passant
+            sr.add_group();
+            sr.condition_any(offset_pos);
+            sr.condition_empty(*target_pos);
+        }
+
+        sr
+    }
+
+    fn check_step_bishop(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
+        let mut sr = StepResult::invalid();
+
+        let calc_pos = (*target_pos - *unit_pos).abs();
+
+        if calc_pos.x == calc_pos.y {
+            sr.valid = true;
+
+            for pos in unit_pos.to(target_pos) {
+                sr.condition_empty(pos);
+            }
+        }
+
+        sr
+    }
+
+    fn check_step_knight(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
+        let mut sr = StepResult::invalid();
+
+        let calc_pos = (*target_pos - *unit_pos).abs();
+
+        if (calc_pos.x == 1 && calc_pos.y == 2) || (calc_pos.x == 2 && calc_pos.y == 1) {
+            sr.valid = true;
+        }
+
+        sr
+    }
+
+    fn check_step_rook(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
+        let mut sr = StepResult::invalid();
+
+        let calc_pos = (*target_pos - *unit_pos).abs();
+
+        if calc_pos.x == 0 || calc_pos.y == 0 {
+            sr.valid = true;
+
+            for pos in unit_pos.to(target_pos) {
+                sr.condition_empty(pos);
+            }
+        }
+
+        sr
+    }
+
+    fn check_step_queen(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
+        let mut sr = StepResult::invalid();
+
+        let calc_pos = (*target_pos - *unit_pos).abs();
+
+        if calc_pos.x == 0 || calc_pos.y == 0 || calc_pos.x == calc_pos.y {
+            sr.valid = true;
+
+            for pos in unit_pos.to(target_pos) {
+                sr.condition_empty(pos);
+            }
+        }
+
+        sr
+    }
+
+    fn check_step_king(
+        &mut self,
+        unit_pos: &Pos,
+        target_pos: &Pos,
+        side: &Side,
+        moved: &Moved,
+    ) -> StepResult {
+        let mut sr = StepResult::invalid();
+
+        let calc_pos = (*target_pos - *unit_pos).abs();
+
+        if calc_pos.x == 0 || calc_pos.y == 0 {
+            sr.valid = true;
+        }
+
+        // TODO! Castle E.g. E1 -> C1 OR G1
+
+        sr
     }
 }
 
@@ -116,39 +245,5 @@ impl Default for Board {
         board.set_unit(Unit::Pawn(Side::White, false), "H2".into());
 
         board
-    }
-}
-
-//==================================================
-//=== Unit Testing
-//==================================================
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_no_condition() {
-        let test_board = Board::default();
-        for (y, row) in test_board.square.into_iter().enumerate() {
-            for (x, col) in row.into_iter().enumerate() {
-                if col.is_some() {
-                    print!("Row: {}, Col: {} = {}\n", y, x, col.unwrap().get_id_str());
-                } else {
-                    print!("Row: {}, Col: {} = Empty\n", y, x);
-                }
-            }
-        }
-
-        if let Some(unit) = test_board.get_unit("H8".into()) {
-            println!("H8 = {}", unit.get_id_str());
-        } else {
-            println!("H8 = Empty");
-        }
-
-        if let Some(unit) = test_board.get_unit("H1".into()) {
-            println!("H1 = {}", unit.get_id_str());
-        } else {
-            println!("H1 = Empty");
-        }
     }
 }

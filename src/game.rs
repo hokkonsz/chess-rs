@@ -34,7 +34,7 @@ impl Chess {
     pub fn background_logic(&mut self) {
         match (self.unit_pos, self.target_pos) {
             (Some(unit_pos), None) => {
-                if let Some(unit) = self.board_state.get_unit(unit_pos) {
+                if let Some(unit) = self.board_state.get_unit(&unit_pos) {
                     if unit.get_side() != self.current_turn {
                         self.unit_pos = None;
                         println!("Not your turn!");
@@ -45,7 +45,7 @@ impl Chess {
                 }
             }
             (Some(unit_pos), Some(taget_pos)) => {
-                if self.board_state.move_unit(unit_pos, taget_pos) {
+                if self.board_state.step_unit(&unit_pos, &taget_pos) {
                     self.current_turn.swap();
                     println!("{} moves next!", self.current_turn);
                 }

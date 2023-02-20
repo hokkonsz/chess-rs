@@ -1,7 +1,5 @@
 // Chess Crate
-use super::pos::Pos;
 use super::side::Side;
-use super::step::StepResult;
 
 // Standard Crate
 use std::fmt;
@@ -20,7 +18,7 @@ pub enum Unit {
     King(Side, Moved),
 }
 
-type Moved = bool;
+pub type Moved = bool;
 
 impl Unit {
     /// Gives back the [Side] of the [`Unit`]
@@ -89,139 +87,20 @@ impl Unit {
         }
     }
 
-    /// Gives back `true`, if the move is possible
-    pub fn try_move(&self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
-        let calc_pos = *target_pos - *unit_pos;
-        match self {
-            Self::Pawn(side, moved) => {
-                Self::check_move_pawn(&unit_pos, &target_pos, &calc_pos, &side, &moved)
-            }
-            Self::Bishop(_) => Self::check_move_bishop(&calc_pos),
-            Self::Knight(_) => Self::check_move_knight(&calc_pos),
-            Self::Rook(_, _) => Self::check_move_rook(&calc_pos),
-            Self::Queen(_) => Self::check_move_queen(&calc_pos),
-            Self::King(_, _) => Self::check_move_king(&calc_pos),
-        }
-    }
-
-    fn check_move_pawn(
-        unit_pos: &Pos,
-        target_pos: &Pos,
-        calc_pos: &Pos,
-        side: &Side,
-        moved: &Moved,
-    ) -> StepResult {
-        let mut move_result = StepResult::invalid();
-        let pos_offset: Pos;
-
-        // Step Direction
-        match side {
-            Side::Black => {
-                if unit_pos.y > target_pos.y {
-                    return move_result;
-                } else {
-                    pos_offset = target_pos.up();
-                }
-            }
-            Side::White => {
-                if unit_pos.y < target_pos.y {
-                    return move_result;
-                } else {
-                    pos_offset = target_pos.down();
-                }
-            }
-        }
-
-        // 1 Step E.g. D5 -> D4
-        // 2 Step E.g. D7 -> D6 OR D7 -> D5
-        if calc_pos.x == 0 {
-            // 1 Step
-            if calc_pos.y == 1 {
-                move_result.valid = true;
-            }
-            // 2 Step
-            else if calc_pos.y == 2 && !moved {
-                move_result.valid = true;
-
-                move_result.condition_any(pos_offset);
-            }
-        }
-        // Capture E.g. D5 -> C4 OR D5 -> E4 [Condition Group ID: 0]
-        // En Passant E.g. D5 -> C4 OR D5 -> E4 [Condition Group ID: 1]
-        else if calc_pos.x == 1 && calc_pos.x == 1 {
-            move_result.valid = true;
-
-            // Capture
-            move_result.condition_any(*target_pos);
-
-            // En Passant
-            move_result.add_group();
-            move_result.condition_any(pos_offset);
-            move_result.condition_empty(*target_pos);
-        }
-
-        move_result
-    }
-
-    fn check_move_bishop(calc_pos: &Pos) -> StepResult {
-        let mut move_result = StepResult::invalid();
-
-        if calc_pos.x == calc_pos.y {
-            move_result.valid = true;
-
-            // TODO! Conditions
-        }
-
-        move_result
-    }
-
-    fn check_move_knight(calc_pos: &Pos) -> StepResult {
-        let mut move_result = StepResult::invalid();
-
-        if (calc_pos.x == 1 && calc_pos.y == 2) || (calc_pos.x == 2 && calc_pos.y == 1) {
-            move_result.valid = true;
-        }
-
-        move_result
-    }
-
-    fn check_move_rook(calc_pos: &Pos) -> StepResult {
-        let mut move_result = StepResult::invalid();
-
-        if calc_pos.x == 0 || calc_pos.y == 0 {
-            move_result.valid = true;
-
-            // TODO! Conditions
-        }
-
-        move_result
-    }
-
-    fn check_move_queen(calc_pos: &Pos) -> StepResult {
-        let mut move_result = StepResult::invalid();
-
-        if calc_pos.x == 0 || calc_pos.y == 0 || calc_pos.x == calc_pos.y {
-            move_result.valid = true;
-
-            // TODO! Conditions
-        }
-
-        move_result
-    }
-
-    fn check_move_king(calc_pos: &Pos) -> StepResult {
-        let mut move_result = StepResult::invalid();
-
-        if calc_pos.x == 0 || calc_pos.y == 0 {
-            move_result.valid = true;
-
-            // TODO! Conditions
-        }
-
-        // TODO! Castle E.g. E1 -> C1 OR G1
-
-        move_result
-    }
+    // /// Gives back `true`, if the move is possible
+    // pub fn try_move(&self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
+    //     let calc_pos = *target_pos - *unit_pos;
+    //     match self {
+    //         Self::Pawn(side, moved) => {
+    //             Self::check_move_pawn(&unit_pos, &target_pos, &calc_pos, &side, &moved)
+    //         }
+    //         Self::Bishop(_) => Self::check_move_bishop(&calc_pos),
+    //         Self::Knight(_) => Self::check_move_knight(&calc_pos),
+    //         Self::Rook(_, _) => Self::check_move_rook(&calc_pos),
+    //         Self::Queen(_) => Self::check_move_queen(&calc_pos),
+    //         Self::King(_, _) => Self::check_move_king(&calc_pos),
+    //     }
+    // }
 }
 
 impl fmt::Display for Unit {

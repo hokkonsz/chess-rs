@@ -15,20 +15,20 @@ pub struct StepResult {
 }
 
 impl StepResult {
-    /// Creates an invalid [`StepResult`] without [`Condition`]s
-    pub fn invalid() -> Self {
-        Self {
-            groups: 0,
-            valid: false,
-            conditions: Vec::new(),
-        }
-    }
-
     /// Creates a valid [`StepResult`] without [`Condition`]s
     pub fn valid() -> Self {
         Self {
             groups: 0,
             valid: true,
+            conditions: Vec::new(),
+        }
+    }
+
+    /// Creates an invalid [`StepResult`] without [`Condition`]s
+    pub fn invalid() -> Self {
+        Self {
+            groups: 0,
+            valid: false,
             conditions: Vec::new(),
         }
     }
@@ -76,7 +76,7 @@ impl StepResult {
     /// Evaluates the [`Condition`]s on the given [`Board`]
     pub fn evaluate(&self, board: &Board) -> bool {
         if self.conditions.is_empty() {
-            return true;
+            return self.valid;
         }
 
         for group_id in 0..=self.groups {
@@ -89,19 +89,19 @@ impl StepResult {
 
                     match condition.test {
                         Test::Empty => {
-                            if !board.get_unit(condition.pos).is_none() {
+                            if !board.get_unit(&condition.pos).is_none() {
                                 group_valid = false;
                                 break;
                             }
                         }
                         Test::Any => {
-                            if !board.get_unit(condition.pos).is_some() {
+                            if !board.get_unit(&condition.pos).is_some() {
                                 group_valid = false;
                                 break;
                             }
                         }
                         Test::Is(cond_unit) => {
-                            if !matches!(board.get_unit(condition.pos), Some(unit) if unit == cond_unit)
+                            if !matches!(board.get_unit(&condition.pos), Some(unit) if unit == cond_unit)
                             {
                                 group_valid = false;
                                 break;
@@ -130,6 +130,9 @@ pub struct Condition {
     test: Test,
 }
 
+// TODO! Test for Enemy Unit!
+
+/// Test cases for condition
 #[derive(Clone, Copy, Debug)]
 enum Test {
     Empty,

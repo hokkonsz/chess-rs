@@ -1,13 +1,15 @@
-use core::panic;
 // Standard Crate
-use std::ops::{Add, Sub};
+use std::{
+    fmt,
+    ops::{Add, Sub},
+};
 
 // CHESS
-const BOARD_SIZE: i32 = 8;
+const BOARD_SIZE: i8 = 8;
 
 // ASCII
-const UPPERCASE_A: i32 = 65;
-const ZERO: i32 = 48;
+const UPPERCASE_A: i8 = 65;
+const ZERO: i8 = 48;
 
 //==================================================
 //=== Pos
@@ -16,8 +18,8 @@ const ZERO: i32 = 48;
 /// Used to position units on the board
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Pos {
-    pub x: i32,
-    pub y: i32,
+    pub x: i8,
+    pub y: i8,
 }
 
 impl Pos {
@@ -26,11 +28,11 @@ impl Pos {
     /// Panics when...
     /// * `x` out of bounds
     /// * `y` out of bounds
-    pub fn new(x: i32, y: i32) -> Self {
+    pub fn new(x: i8, y: i8) -> Self {
         let pos = Self { x, y };
 
         if !pos.is_onboard() {
-            panic!("Trying to create a Pos out of board area");
+            panic!("Cant create Pos: {} - Pos Not On Board", pos);
         }
 
         pos
@@ -165,6 +167,13 @@ impl Pos {
 
         positions
     }
+
+    pub fn abs(&self) -> Self {
+        Self {
+            x: self.x.abs(),
+            y: self.y.abs(),
+        }
+    }
 }
 
 impl Default for Pos {
@@ -177,8 +186,8 @@ impl Add for Pos {
     type Output = Pos;
     fn add(self, rhs: Self) -> Self {
         Self {
-            x: (self.x + rhs.x).clamp(0, BOARD_SIZE - 1),
-            y: (self.y + rhs.y).clamp(0, BOARD_SIZE - 1),
+            x: (self.x + rhs.x),
+            y: (self.y + rhs.y),
         }
     }
 }
@@ -187,9 +196,15 @@ impl Sub for Pos {
     type Output = Pos;
     fn sub(self, rhs: Self) -> Self {
         Self {
-            x: (self.x - rhs.x).clamp(0, BOARD_SIZE - 1),
-            y: (self.y - rhs.y).clamp(0, BOARD_SIZE - 1),
+            x: (self.x - rhs.x),
+            y: (self.y - rhs.y),
         }
+    }
+}
+
+impl fmt::Display for Pos {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
     }
 }
 
@@ -201,11 +216,11 @@ impl From<&str> for Pos {
     /// * [`Pos`] would be out of bounds
     fn from(s: &str) -> Self {
         if s.len() != 2 && !s.is_ascii() {
-            panic!("Can't convert from &str: {} - Length != 2 or Not ASCII", s);
+            panic!("Cant convert from &str: {} - Length != 2 or Not ASCII", s);
         }
 
-        let col = s.to_ascii_uppercase().as_bytes()[0] as i32;
-        let row = s.to_ascii_uppercase().as_bytes()[1] as i32;
+        let col = s.to_ascii_uppercase().as_bytes()[0] as i8;
+        let row = s.to_ascii_uppercase().as_bytes()[1] as i8;
 
         // ASCII Space -> Array Space
         let pos = Self {
@@ -214,25 +229,22 @@ impl From<&str> for Pos {
         };
 
         if !pos.is_onboard() {
-            panic!("Can't convert from &str: {} - Pos Not On Board", s);
+            panic!("Cant convert from &str: {} - Pos Not On Board", pos);
         }
 
         pos
     }
 }
 
-impl From<(i32, i32)> for Pos {
-    fn from(tuple: (i32, i32)) -> Self {
+impl From<(i8, i8)> for Pos {
+    fn from(tuple: (i8, i8)) -> Self {
         let pos = Self {
             x: tuple.0,
             y: tuple.1,
         };
 
         if !pos.is_onboard() {
-            panic!(
-                "Can't convert from (i32, i32):\n {:#?}\n - Pos Not On Board",
-                tuple
-            );
+            panic!("Cant convert from (i8, i8): {} - Pos Not On Board", pos);
         }
 
         pos
