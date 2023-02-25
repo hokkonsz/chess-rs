@@ -1,375 +1,317 @@
 // Chess Crate
 use super::board::Board;
 use super::pos::Pos;
-use super::unit::Unit;
+use super::side::Side;
+use super::unit::{eq_unit_type, Unit};
+
+type GroupID = i8;
+type UnitPos = Pos;
+type TargetPos = Pos;
 
 //==================================================
 //=== Step
 //==================================================
 
+pub trait State {}
+impl State for ConditionState {}
+impl State for ResultState {}
+
 #[derive(Debug)]
-pub struct StepResult {
-    groups: usize,
-    pub valid: bool,
-    conditions: Vec<Condition>,
+pub struct Step<S: State> {
+    groups: GroupID,
+    step_valid: bool,
+    condition_state: S,
+    actions: Vec<StepAction>,
 }
 
-impl StepResult {
-    /// Creates a valid [`StepResult`] without [`Condition`]s
-    pub fn valid() -> Self {
+//==================================================
+//=== Step: ConditionState
+//==================================================
+
+impl Step<ConditionState> {
+    /// Creates a new [`Step`] with [`ConditionState`]
+    pub fn new(step_valid: bool) -> Self {
         Self {
             groups: 0,
-            valid: true,
-            conditions: Vec::new(),
+            step_valid,
+            condition_state: ConditionState::new(),
+            actions: Vec::new(),
         }
     }
 
-    /// Creates an invalid [`StepResult`] without [`Condition`]s
-    pub fn invalid() -> Self {
-        Self {
-            groups: 0,
-            valid: false,
-            conditions: Vec::new(),
-        }
+    /// Sets `step_valid` to the given value
+    pub fn set(&mut self, step_valid: bool) {
+        self.step_valid = step_valid;
     }
 
-    /// Adds [`Condition`] to [`StepResult`]
-    ///
-    /// Checks if the [`Pos`] is empty
-    pub fn condition_empty(&mut self, pos: Pos) {
-        self.conditions.push(Condition {
-            group_id: self.groups,
-            pos,
-            test: Test::Empty,
-        })
-    }
-
-    /// Adds [`Condition`] to [`StepResult`]
-    ///
-    /// Checks if the [`Pos`] is occupied by any [`Unit`]
-    pub fn condition_any(&mut self, pos: Pos) {
-        self.conditions.push(Condition {
-            group_id: self.groups,
-            pos,
-            test: Test::Any,
-        })
-    }
-
-    /// Adds [`Condition`] to [`StepResult`]
-    ///
-    /// Checks if the [`Pos`] is occupied by the given [`Unit`]
-    pub fn condition_unit(&mut self, pos: Pos, unit: Unit) {
-        self.conditions.push(Condition {
-            group_id: self.groups,
-            pos,
-            test: Test::Is(unit),
-        })
-    }
-
-    /// Increases the number of groups in [`StepResult`]
-    pub fn add_group(&mut self) {
-        if self.groups < self.conditions.len() {
+    /// Increases the number of groups in [`Step`]
+    pub fn next_group(&mut self) {
+        if self.groups < self.condition_state.step_conditions.len() as i8 {
             self.groups += 1;
         }
     }
 
-    /// Evaluates the [`Condition`]s on the given [`Board`]
-    pub fn evaluate(&self, board: &Board) -> bool {
-        if self.conditions.is_empty() {
-            return self.valid;
-        }
+    /// Adds an [`Action`] to [`Step`], which removes the unit at `pos`
+    pub fn add_action_remove(&mut self, pos: Pos) {
+        self.actions.push(StepAction {
+            group_id: self.groups,
+            command: Command::Remove(pos),
+        })
+    }
 
-        for group_id in 0..=self.groups {
-            let mut group_valid = true;
-            let mut num_conditions = 0;
+    /// Adds an [`Action`] to [`Step`], which moves the unit from `unit_pos` to `target_pos`
+    pub fn add_action_move(&mut self, unit_pos: Pos, target_pos: Pos) {
+        self.actions.push(StepAction {
+            group_id: self.groups,
+            command: Command::Move(unit_pos, target_pos),
+        })
+    }
 
-            for condition in self.conditions.as_slice() {
-                if condition.group_id == group_id {
-                    num_conditions += 1;
+    /// Adds a [`StepCondition`] to [`Step`]
+    ///
+    /// Checks if the [`Pos`] is NOT occupied by any [`Unit`]
+    pub fn add_cond_pos_is_none(&mut self, pos: Pos) {
+        self.condition_state.step_conditions.push(StepCondition {
+            group_id: self.groups,
+            pos,
+            test: Test::None,
+        })
+    }
 
-                    match condition.test {
-                        Test::Empty => {
-                            if !board.get_unit(&condition.pos).is_none() {
-                                group_valid = false;
-                                break;
-                            }
-                        }
-                        Test::Any => {
-                            if !board.get_unit(&condition.pos).is_some() {
-                                group_valid = false;
-                                break;
-                            }
-                        }
-                        Test::Is(cond_unit) => {
-                            if !matches!(board.get_unit(&condition.pos), Some(unit) if unit == cond_unit)
-                            {
-                                group_valid = false;
-                                break;
-                            }
+    /// Adds a [`StepCondition`] to [`Step`]
+    ///
+    /// Checks if the [`Unit`] at `pos` is an enemy to `side`
+    pub fn add_cond_pos_is_enemy(&mut self, pos: Pos, side: &Side) {
+        self.condition_state.step_conditions.push(StepCondition {
+            group_id: self.groups,
+            pos,
+            test: Test::Enemy(*side),
+        })
+    }
+
+    /// Adds a [`StepCondition`] to [`Step`]
+    ///
+    /// Checks if the [`Unit`] at `pos` is EITHER an enemy to `side` OR NOT occupied by any [`Unit`]
+    pub fn add_cond_pos_is_enemy_or_none(&mut self, pos: Pos, side: &Side) {
+        self.condition_state.step_conditions.push(StepCondition {
+            group_id: self.groups,
+            pos,
+            test: Test::EnemyOrNone(*side),
+        })
+    }
+
+    /// Adds a [`StepCondition`] to [`Step`]
+    ///
+    /// Checks if the [`Unit`] at `pos` is NOT the King Type
+    pub fn add_cond_pos_not_king(&mut self, pos: Pos) {
+        self.condition_state.step_conditions.push(StepCondition {
+            group_id: self.groups,
+            pos,
+            test: Test::NotKing,
+        })
+    }
+
+    /// Adds a [`StepCondition`] to [`Step`]
+    ///
+    /// Checks if the [`Unit`] at `pos` is NOT moved yet
+    pub fn add_cond_pos_not_moved(&mut self, pos: Pos) {
+        self.condition_state.step_conditions.push(StepCondition {
+            group_id: self.groups,
+            pos,
+            test: Test::NotMoved,
+        })
+    }
+
+    /// Evaluates the [`StepCondition`]s on the given [`Board`]
+    ///
+    /// [`StepCondition`]s with the same `group_id` are connected with `AND`
+    ///
+    /// [`StepCondition`]s with the diferent `group_id` are connected with `OR`
+    pub fn evaluate(&self, board: &Board) -> Step<ResultState> {
+        let mut step = Step {
+            groups: self.groups,
+            step_valid: self.step_valid,
+            condition_state: ResultState::new(),
+            actions: self.actions.clone(),
+        };
+
+        let mut group_valid = self.step_valid;
+        let mut group_id = 0;
+
+        for condition in self.condition_state.step_conditions.as_slice() {
+            // Valid Group Found
+            if condition.group_id > group_id && group_valid {
+                break;
+            }
+
+            // Next Group
+            if condition.group_id > group_id && !group_valid {
+                group_id += 1;
+                group_valid = true;
+            }
+
+            // Skip Until Next Group
+            if condition.group_id == group_id && !group_valid {
+                continue;
+            }
+
+            match condition.test {
+                Test::None => {
+                    if !board.get_unit(&condition.pos).is_none() {
+                        group_valid = false;
+                    }
+                }
+                Test::Enemy(side) => {
+                    if !matches!(board.get_unit(&condition.pos), Some(unit) if unit.get_side() != side)
+                    {
+                        group_valid = false;
+                    }
+                }
+                Test::EnemyOrNone(side) => {
+                    if board.get_unit(&condition.pos).is_some() {
+                        if !matches!(board.get_unit(&condition.pos), Some(unit) if unit.get_side() != side)
+                        {
+                            group_valid = false;
                         }
                     }
                 }
-            }
-
-            if group_valid == true && num_conditions != 0 {
-                return true;
+                Test::NotKing => {
+                    if board.get_unit(&condition.pos).is_some() {
+                        if !matches!(board.get_unit(&condition.pos), Some(unit) if eq_unit_type(&Unit::King(Side::Black, true), &unit))
+                        {
+                            group_valid = false;
+                        }
+                    }
+                }
+                Test::NotMoved => {
+                    if !matches!(board.get_unit(&condition.pos), Some(unit) if !unit.is_moved()) {
+                        group_valid = false;
+                    }
+                }
             }
         }
 
-        false
+        if group_valid == true {
+            step.set(true, group_id);
+        }
+
+        step
     }
 }
 
-/// Conditions with the same `group_id` are connected with `AND`
-///
-/// Conditions with the diferent `group_id` are connected with `OR`
+pub struct ConditionState {
+    step_conditions: Vec<StepCondition>,
+}
+
+impl ConditionState {
+    /// Creates a mew [`ConditionState`] with empty `step_conditions`
+    fn new() -> Self {
+        Self {
+            step_conditions: Vec::new(),
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug)]
-pub struct Condition {
-    group_id: usize,
+struct StepCondition {
+    group_id: GroupID,
     pos: Pos,
     test: Test,
 }
 
-// TODO! Test for Enemy Unit!
-
-/// Test cases for condition
 #[derive(Clone, Copy, Debug)]
 enum Test {
-    Empty,
-    Any,
-    Is(Unit),
+    None,
+    Enemy(Side),
+    EnemyOrNone(Side),
+    NotKing,
+    NotMoved,
 }
 
 //==================================================
-//=== Unit Testing
+//=== Step: ResultState
 //==================================================
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::side::Side;
 
-    #[test]
-    fn test_no_condition() {
-        let sr = StepResult::valid();
-
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
+impl Step<ResultState> {
+    /// Sets [`StepResult`]'s `valid` and `group_id` values
+    fn set(&mut self, result_valid: bool, group_id: GroupID) {
+        self.condition_state.step_result.valid = result_valid;
+        self.condition_state.step_result.group_id = Some(group_id);
     }
 
-    #[test]
-    fn test_invalid() {
-        let mut sr = StepResult::invalid();
-
-        // [Group 0:] H2 -> Pawn
-        sr.condition_empty("H2".into());
-
-        let test_board = Board::default();
-        assert!(!sr.evaluate(&test_board));
+    /// Checks if [`StepResult`] is valid
+    pub fn is_valid(&self) -> bool {
+        self.condition_state.step_result.valid
     }
 
-    #[test]
-    fn test_empty1() {
-        let mut sr = StepResult::valid();
+    /// Executes the [`StepAction`]s on the given board based on the [`StepResult`]
+    pub fn execute_actions(&self, board: &mut Board) -> () {
+        // Empty GroupID
+        if self.condition_state.step_result.group_id.is_none() {
+            return;
+        }
 
-        // [Group 0:] H2 -> Empty
-        sr.condition_empty("D4".into());
+        // Invalid SterResult
+        if !self.condition_state.step_result.valid {
+            return;
+        }
 
-        // [Group 1:] H2 -> Pawn
-        sr.add_group();
-        sr.condition_empty("H2".into());
-
-        // [Group 2:] D8 -> Queen
-        sr.add_group();
-        sr.condition_empty("D8".into());
-
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
+        for action in &self.actions {
+            if self.condition_state.step_result.group_id.unwrap() == action.group_id {
+                action.command.execute(board);
+            }
+        }
     }
+}
 
-    #[test]
-    fn test_empty2() {
-        let mut sr = StepResult::valid();
+pub struct ResultState {
+    step_result: StepResult,
+}
 
-        // [Group 0:] H2 -> Pawn
-        sr.condition_empty("H2".into());
-
-        // [Group 1:] E1 -> King
-        sr.add_group();
-        sr.condition_empty("E1".into());
-
-        // [Group 2:] D8 -> Queen
-        sr.add_group();
-        sr.condition_empty("D8".into());
-
-        let test_board = Board::default();
-        assert!(!sr.evaluate(&test_board));
+impl ResultState {
+    /// Creates a new [`ResultState`] with an invalid `step_result`
+    fn new() -> Self {
+        Self {
+            step_result: StepResult {
+                group_id: None,
+                valid: false,
+            },
+        }
     }
+}
 
-    #[test]
-    fn test_empty3() {
-        let mut sr = StepResult::valid();
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct StepResult {
+    group_id: Option<GroupID>,
+    valid: bool,
+}
 
-        // [Group 0:] H2 -> Pawn | A2 -> Pawn
-        sr.condition_empty("H2".into());
-        sr.condition_empty("A2".into());
+//==================================================
+//=== Action & Command
+//==================================================
 
-        // [Group 1:] D4 -> Empty | H2 -> Empty | D8 -> Empty
-        sr.add_group();
-        sr.condition_empty("D4".into());
-        sr.condition_empty("H4".into());
-        sr.condition_empty("D4".into());
+#[derive(Clone, Copy, Debug)]
+struct StepAction {
+    group_id: GroupID,
+    command: Command,
+}
 
-        // [Group 2:] D4 -> Empty | H4 -> Empty | A2 -> Pawn
-        sr.add_group();
-        sr.condition_empty("D4".into());
-        sr.condition_empty("H4".into());
-        sr.condition_empty("A2".into());
+#[derive(Clone, Copy, Debug)]
+enum Command {
+    Remove(UnitPos),
+    Move(UnitPos, TargetPos),
+}
 
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_empty_group1() {
-        let mut sr = StepResult::valid();
-
-        // Add group should do nothing here!
-        sr.add_group();
-
-        // [Group 0:] D4 -> Empty | H2 -> Pawn | E4 -> Empty
-        sr.condition_empty("D4".into());
-        sr.condition_empty("H2".into());
-        sr.condition_empty("E4".into());
-
-        // [Group 1:] D4 -> Empty | H4 -> Empty | A4 -> Empty
-        sr.add_group();
-        sr.condition_empty("D4".into());
-        sr.condition_empty("H4".into());
-        sr.condition_empty("A4".into());
-
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_empty_group2() {
-        let mut sr = StepResult::valid();
-
-        // [Group 0:] D4 -> Empty | H2 -> Pawn | e4 -> Empty
-        sr.add_group();
-        sr.condition_empty("D4".into());
-        sr.condition_empty("H2".into());
-        sr.condition_empty("E4".into());
-
-        // [Group 1:] D4 -> Empty | E2 -> Pawn
-        sr.add_group();
-        sr.condition_empty("D4".into());
-        sr.condition_empty("E2".into());
-
-        // [Group 2:] Empty Group
-        sr.add_group();
-
-        let test_board = Board::default();
-        assert!(!sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_occupied1() {
-        let mut sr = StepResult::valid();
-
-        // [Group 0:] D4 -> Empty
-        sr.condition_any("A4".into());
-
-        // [Group 1:] D2 -> Queen
-        sr.add_group();
-        sr.condition_any("D2".into());
-
-        // [Group 2:] E4 -> Empty
-        sr.add_group();
-        sr.condition_any("E4".into());
-
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_occupied2() {
-        let mut sr = StepResult::valid();
-
-        // [Group 0:] A4 -> Empty
-        sr.condition_any("A4".into());
-
-        // [Group 1:] H4 -> Empty
-        sr.add_group();
-        sr.condition_any("H4".into());
-
-        // [Group 2:] D4 -> Empty
-        sr.add_group();
-        sr.condition_any("D4".into());
-
-        let test_board = Board::default();
-        assert!(!sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_occupied3() {
-        let mut sr = StepResult::valid();
-
-        // [Group 0:] H4 -> Empty | A4 -> Empty
-        sr.condition_any("H4".into());
-        sr.condition_any("A4".into());
-
-        // [Group 1:] H8 -> Rook | H2 -> Pawn | H1 -> Rook
-        sr.add_group();
-        sr.condition_any("H8".into());
-        sr.condition_any("H2".into());
-        sr.condition_any("H1".into());
-
-        // [Group 2:] D4 -> Empty | H4 -> Empty | A4 -> Empty
-        sr.add_group();
-        sr.condition_any("D4".into());
-        sr.condition_any("H4".into());
-        sr.condition_any("A4".into());
-
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_occupiedby1() {
-        let mut sr = StepResult::valid();
-
-        // [Group 0:] A4 -> Empty
-        sr.condition_unit("A4".into(), Unit::Rook(Side::Black, false));
-
-        // [Group 1:] D2 -> Pawn
-        sr.add_group();
-        sr.condition_unit("D2".into(), Unit::Rook(Side::Black, false));
-
-        // [Group 2:] H8 -> Rook
-        sr.add_group();
-        sr.condition_unit("H8".into(), Unit::Rook(Side::Black, false));
-
-        let test_board = Board::default();
-        assert!(sr.evaluate(&test_board));
-    }
-
-    #[test]
-    fn test_occupiedby2() {
-        let mut sr = StepResult::valid();
-
-        // [Group 0:] A4 -> Empty
-        sr.condition_unit("A4".into(), Unit::Pawn(Side::Black, false));
-
-        // [Group 1:] H2 -> White Pawn
-        sr.add_group();
-        sr.condition_unit("H2".into(), Unit::Pawn(Side::Black, false));
-
-        // [Group 2:] D1 -> Queen
-        sr.add_group();
-        sr.condition_unit("D1".into(), Unit::Pawn(Side::Black, false));
-
-        let test_board = Board::default();
-        assert!(!sr.evaluate(&test_board));
+impl Command {
+    fn execute(&self, board: &mut Board) {
+        match self {
+            Self::Remove(pos) => board.remove_unit(pos),
+            Self::Move(unit_pos, target_pos) => {
+                if let Some(unit) = board.get_unit(unit_pos) {
+                    board.remove_unit(unit_pos);
+                    board.set_unit(unit, *target_pos);
+                }
+            }
+        }
     }
 }

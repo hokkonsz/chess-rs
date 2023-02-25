@@ -44,8 +44,8 @@ impl Chess {
                     println!("Can't move with an empty square!");
                 }
             }
-            (Some(unit_pos), Some(taget_pos)) => {
-                if self.board_state.step_unit(&unit_pos, &taget_pos) {
+            (Some(unit_pos), Some(target_pos)) => {
+                if self.board_state.step_unit(&unit_pos, &target_pos) {
                     self.current_turn.swap();
                     println!("{} moves next!", self.current_turn);
                 }

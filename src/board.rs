@@ -2,9 +2,8 @@
 use super::pos::Pos;
 use super::side::Side;
 use super::unit::{Moved, Unit};
-use crate::step::StepResult;
+use crate::step::*;
 
-// CHESS
 const BOARD_SIZE: usize = 8;
 
 //==================================================
@@ -45,23 +44,25 @@ impl Board {
 
     /// Mutates [`Board`] when called with a viable step
     pub fn step_unit(&mut self, unit_pos: &Pos, target_pos: &Pos) -> bool {
+        // Check Step
         let selected_unit = self.get_unit(unit_pos).unwrap();
-        let sr = match selected_unit {
+        let step = match selected_unit {
             Unit::Pawn(side, moved) => self.check_step_pawn(&unit_pos, &target_pos, &side, &moved),
-            Unit::Bishop(_) => self.check_step_bishop(&unit_pos, &target_pos),
-            Unit::Knight(_) => self.check_step_knight(&unit_pos, &target_pos),
-            Unit::Rook(_, _) => self.check_step_rook(&unit_pos, &target_pos),
-            Unit::Queen(_) => self.check_step_queen(&unit_pos, &target_pos),
+            Unit::Bishop(side) => self.check_step_bishop(&unit_pos, &target_pos, &side),
+            Unit::Knight(side) => self.check_step_knight(&unit_pos, &target_pos, &side),
+            Unit::Rook(side, _) => self.check_step_rook(&unit_pos, &target_pos, &side),
+            Unit::Queen(side) => self.check_step_queen(&unit_pos, &target_pos, &side),
             Unit::King(side, moved) => self.check_step_king(&unit_pos, &target_pos, &side, &moved),
         };
 
-        if !sr.evaluate(&self) {
+        // Evaluate
+        let step = step.evaluate(&self);
+        if !step.is_valid() {
             return false;
         }
 
         // Step Unit
-        self.remove_unit(unit_pos);
-        self.set_unit(selected_unit, *target_pos);
+        step.execute_actions(self);
         true
     }
 
@@ -71,8 +72,8 @@ impl Board {
         target_pos: &Pos,
         side: &Side,
         moved: &Moved,
-    ) -> StepResult {
-        let mut sr = StepResult::invalid();
+    ) -> Step<ConditionState> {
+        let mut step = Step::new(false);
 
         let mut calc_pos = *target_pos - *unit_pos;
         let offset_pos;
@@ -80,101 +81,154 @@ impl Board {
         match side {
             Side::Black if calc_pos.y > 0 => offset_pos = target_pos.up(),
             Side::White if calc_pos.y < 0 => offset_pos = target_pos.down(),
-            _ => return sr,
+            _ => return step,
         };
 
-        // 1 Step E.g. D5 -> D4
-        // 2 Step E.g. D7 -> D6 OR D7 -> D5
+        // 1 Vertical Step E.g. D5 -> D4
+        // 2 Vertical Step E.g. D7 -> D6 OR D7 -> D5
         calc_pos = calc_pos.abs();
-        println!("1: {}", calc_pos);
-        println!("2: {}", offset_pos);
         if calc_pos.x == 0 {
             // 1 Step
             if calc_pos.y == 1 {
-                sr.valid = true;
+                step.set(true);
+
+                step.add_cond_pos_is_none(*target_pos);
+
+                step.add_action_move(*unit_pos, *target_pos);
             }
             // 2 Step
             else if calc_pos.y == 2 && !moved {
-                sr.valid = true;
+                step.set(true);
 
-                sr.condition_empty(offset_pos);
+                step.add_cond_pos_is_none(offset_pos);
+                step.add_cond_pos_is_none(*target_pos);
+
+                step.add_action_move(*unit_pos, *target_pos);
             }
         }
         // Capture E.g. D5 -> C4 OR D5 -> E4 [Condition Group ID: 0]
         // En Passant E.g. D5 -> C4 OR D5 -> E4 [Condition Group ID: 1]
         else if calc_pos.x == 1 && calc_pos.x == 1 {
-            sr.valid = true;
+            step.set(true);
 
             // Capture
-            sr.condition_any(*target_pos);
+            step.add_cond_pos_is_enemy(*target_pos, side);
+            step.add_cond_pos_not_king(*target_pos);
+
+            step.add_action_move(*unit_pos, *target_pos);
 
             // En Passant
-            sr.add_group();
-            sr.condition_any(offset_pos);
-            sr.condition_empty(*target_pos);
+            step.next_group();
+            step.add_cond_pos_is_enemy(offset_pos, side);
+            step.add_cond_pos_not_king(offset_pos);
+            step.add_cond_pos_is_none(*target_pos);
+
+            step.add_action_remove(offset_pos);
+            step.add_action_move(*unit_pos, *target_pos);
         }
 
-        sr
+        step
     }
 
-    fn check_step_bishop(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
-        let mut sr = StepResult::invalid();
+    fn check_step_bishop(
+        &mut self,
+        unit_pos: &Pos,
+        target_pos: &Pos,
+        side: &Side,
+    ) -> Step<ConditionState> {
+        let mut step = Step::new(false);
 
         let calc_pos = (*target_pos - *unit_pos).abs();
 
-        if calc_pos.x == calc_pos.y {
-            sr.valid = true;
+        // Diagonal Step
+        if calc_pos.x == calc_pos.y && calc_pos.sum() != 0 {
+            step.set(true);
 
             for pos in unit_pos.to(target_pos) {
-                sr.condition_empty(pos);
+                step.add_cond_pos_is_none(pos);
             }
+            step.add_cond_pos_not_king(*target_pos);
+            step.add_cond_pos_is_enemy_or_none(*target_pos, side);
+
+            step.add_action_move(*unit_pos, *target_pos);
         }
 
-        sr
+        step
     }
 
-    fn check_step_knight(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
-        let mut sr = StepResult::invalid();
+    fn check_step_knight(
+        &mut self,
+        unit_pos: &Pos,
+        target_pos: &Pos,
+        side: &Side,
+    ) -> Step<ConditionState> {
+        let mut step = Step::new(false);
 
         let calc_pos = (*target_pos - *unit_pos).abs();
 
+        // L Step
         if (calc_pos.x == 1 && calc_pos.y == 2) || (calc_pos.x == 2 && calc_pos.y == 1) {
-            sr.valid = true;
+            step.set(true);
+
+            step.add_cond_pos_not_king(*target_pos);
+            step.add_cond_pos_is_enemy_or_none(*target_pos, side);
+
+            step.add_action_move(*unit_pos, *target_pos);
         }
 
-        sr
+        step
     }
 
-    fn check_step_rook(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
-        let mut sr = StepResult::invalid();
+    fn check_step_rook(
+        &mut self,
+        unit_pos: &Pos,
+        target_pos: &Pos,
+        side: &Side,
+    ) -> Step<ConditionState> {
+        let mut step = Step::new(false);
 
         let calc_pos = (*target_pos - *unit_pos).abs();
 
-        if calc_pos.x == 0 || calc_pos.y == 0 {
-            sr.valid = true;
+        // Horizontal / Vertical Step
+        if (calc_pos.x == 0 || calc_pos.y == 0) && calc_pos.sum() != 0 {
+            step.set(true);
 
             for pos in unit_pos.to(target_pos) {
-                sr.condition_empty(pos);
+                step.add_cond_pos_is_none(pos);
             }
+            step.add_cond_pos_not_king(*target_pos);
+            step.add_cond_pos_is_enemy_or_none(*target_pos, side);
+
+            step.add_action_move(*unit_pos, *target_pos);
         }
 
-        sr
+        step
     }
 
-    fn check_step_queen(&mut self, unit_pos: &Pos, target_pos: &Pos) -> StepResult {
-        let mut sr = StepResult::invalid();
+    fn check_step_queen(
+        &mut self,
+        unit_pos: &Pos,
+        target_pos: &Pos,
+        side: &Side,
+    ) -> Step<ConditionState> {
+        let mut step = Step::new(false);
 
         let calc_pos = (*target_pos - *unit_pos).abs();
 
-        if calc_pos.x == 0 || calc_pos.y == 0 || calc_pos.x == calc_pos.y {
-            sr.valid = true;
+        // Horizontal / Vertical / Diagonal Step
+        if (calc_pos.x == 0 || calc_pos.y == 0 || calc_pos.x == calc_pos.y) && calc_pos.sum() != 0 {
+            step.set(true);
 
             for pos in unit_pos.to(target_pos) {
-                sr.condition_empty(pos);
+                step.add_cond_pos_is_none(pos);
             }
+            step.add_cond_pos_not_king(*target_pos);
+            step.add_cond_pos_is_enemy_or_none(*target_pos, side);
+
+            step.add_action_move(*unit_pos, *target_pos);
         }
 
-        sr
+        step
     }
 
     fn check_step_king(
@@ -183,18 +237,46 @@ impl Board {
         target_pos: &Pos,
         side: &Side,
         moved: &Moved,
-    ) -> StepResult {
-        let mut sr = StepResult::invalid();
+    ) -> Step<ConditionState> {
+        let mut step = Step::new(false);
 
-        let calc_pos = (*target_pos - *unit_pos).abs();
+        let calc_pos = *target_pos - *unit_pos;
 
-        if calc_pos.x == 0 || calc_pos.y == 0 {
-            sr.valid = true;
+        // 1 Area Step
+        if calc_pos.x.abs() <= 1 && calc_pos.y.abs() <= 1 {
+            step.set(true);
+
+            step.add_cond_pos_is_enemy_or_none(*target_pos, side);
+
+            step.add_action_move(*unit_pos, *target_pos);
+        } else if calc_pos.y == 0 {
+            // Castle Left E.g. E1 -> C1
+            if calc_pos.x == -2 && !moved {
+                step.set(true);
+
+                for pos in unit_pos.to(&target_pos.left().left()) {
+                    step.add_cond_pos_is_none(pos);
+                }
+                step.add_cond_pos_not_moved(target_pos.left().left());
+
+                step.add_action_move(*unit_pos, *target_pos);
+                step.add_action_move(target_pos.left().left(), target_pos.right());
+            }
+            // Castle Right E.g. E1 -> G1
+            else if calc_pos.x == 2 && !moved {
+                step.set(true);
+
+                for pos in unit_pos.to(&target_pos.right()) {
+                    step.add_cond_pos_is_none(pos);
+                }
+                step.add_cond_pos_not_moved(target_pos.right());
+
+                step.add_action_move(*unit_pos, *target_pos);
+                step.add_action_move(target_pos.right(), target_pos.left());
+            }
         }
 
-        // TODO! Castle E.g. E1 -> C1 OR G1
-
-        sr
+        step
     }
 }
 

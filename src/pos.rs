@@ -4,10 +4,7 @@ use std::{
     ops::{Add, Sub},
 };
 
-// CHESS
 const BOARD_SIZE: i8 = 8;
-
-// ASCII
 const UPPERCASE_A: i8 = 65;
 const ZERO: i8 = 48;
 
@@ -168,11 +165,17 @@ impl Pos {
         positions
     }
 
+    /// Gives back the absolute value variant of [`Pos`]
     pub fn abs(&self) -> Self {
         Self {
             x: self.x.abs(),
             y: self.y.abs(),
         }
+    }
+
+    /// Gives back the sum of `x` and `y` of the given [`Pos`]
+    pub fn sum(&self) -> i8 {
+        self.x + self.y
     }
 }
 
@@ -248,92 +251,5 @@ impl From<(i8, i8)> for Pos {
         }
 
         pos
-    }
-}
-
-//==================================================
-//=== Unit Testing
-//==================================================
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_up() {
-        assert_eq!(Pos::from("D5"), Pos::from("D4").up());
-    }
-
-    #[test]
-    fn test_up_left() {
-        assert_eq!(Pos::from("C5"), Pos::from("D4").up_left());
-    }
-
-    #[test]
-    fn test_up_right() {
-        assert_eq!(Pos::from("E5"), Pos::from("D4").up_right());
-    }
-
-    #[test]
-    fn test_down() {
-        assert_eq!(Pos::from("D3"), Pos::from("D4").down());
-    }
-
-    #[test]
-    fn test_down_left() {
-        assert_eq!(Pos::from("C3"), Pos::from("D4").down_left());
-    }
-
-    #[test]
-    fn test_down_right() {
-        assert_eq!(Pos::from("E3"), Pos::from("D4").down_right());
-    }
-
-    #[test]
-    fn test_left() {
-        assert_eq!(Pos::from("C4"), Pos::from("D4").left());
-    }
-
-    #[test]
-    fn test_right() {
-        assert_eq!(Pos::from("E4"), Pos::from("D4").right());
-    }
-
-    //===========
-
-    #[test]
-    fn test_to1() {
-        assert_eq!(Pos::from("D2").to(&Pos::from("D2")), vec![]);
-    }
-
-    #[test]
-    fn test_to2() {
-        assert_eq!(Pos::from("D2").to(&Pos::from("D2")), vec![]);
-    }
-
-    #[test]
-    fn test_to3() {
-        assert_eq!(Pos::from("D2").to(&Pos::from("D2")), vec![]);
-    }
-
-    //===========
-
-    #[test]
-    fn test_fromstr1() {
-        assert_eq!(Pos::from("D2"), Pos::new(0, 0));
-    }
-
-    #[test]
-    fn test_fromstr2() {
-        assert_eq!(Pos::from("D2"), Pos::new(0, 0));
-    }
-
-    #[test]
-    fn test_fromstr3() {
-        assert_eq!(Pos::from("D2"), Pos::new(0, 0));
-    }
-
-    #[test]
-    fn test_fromstr4() {
-        assert_eq!(Pos::from("D2"), Pos::new(0, 0));
     }
 }

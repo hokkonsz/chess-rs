@@ -5,7 +5,6 @@ use std::fmt;
 //=== Unit
 //==================================================
 
-// TODO! Tryout Phantom Data
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Side {
     Black,
@@ -13,11 +12,21 @@ pub enum Side {
 }
 
 impl Side {
+    /// Mutates [`Side`] to the opposite side
     pub fn swap(&mut self) {
         if *self == Self::Black {
             *self = Self::White
         } else {
             *self = Self::Black
+        }
+    }
+
+    /// Gives back an opposite [`Side`]
+    pub fn oppose(&self) -> Self {
+        if *self == Self::Black {
+            Self::White
+        } else {
+            Self::Black
         }
     }
 }

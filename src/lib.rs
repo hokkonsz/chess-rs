@@ -3,6 +3,7 @@ mod game;
 mod pos;
 mod side;
 mod step;
+// mod test;
 mod unit;
 
 pub mod prelude {
