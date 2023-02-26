@@ -168,7 +168,7 @@ impl Step<ConditionState> {
                     }
                 }
                 Test::EnemyOrNone(side) => {
-                    if board.get_unit(&condition.pos).is_some() {
+                    if !board.get_unit(&condition.pos).is_none() {
                         if !matches!(board.get_unit(&condition.pos), Some(unit) if unit.get_side() != side)
                         {
                             group_valid = false;
@@ -176,8 +176,8 @@ impl Step<ConditionState> {
                     }
                 }
                 Test::NotKing => {
-                    if board.get_unit(&condition.pos).is_some() {
-                        if !matches!(board.get_unit(&condition.pos), Some(unit) if eq_unit_type(&Unit::King(Side::Black, true), &unit))
+                    if !board.get_unit(&condition.pos).is_none() {
+                        if !matches!(board.get_unit(&condition.pos), Some(unit) if !eq_unit_type(&Unit::King(Side::Black, true), &unit))
                         {
                             group_valid = false;
                         }
@@ -309,7 +309,7 @@ impl Command {
             Self::Move(unit_pos, target_pos) => {
                 if let Some(unit) = board.get_unit(unit_pos) {
                     board.remove_unit(unit_pos);
-                    board.set_unit(unit, *target_pos);
+                    board.set_unit(unit.set_moved(true), *target_pos);
                 }
             }
         }

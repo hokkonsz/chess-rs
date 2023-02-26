@@ -122,9 +122,9 @@ pub fn eq_unit_type(unit1: &Unit, unit2: &Unit) -> bool {
         (Unit::Pawn(_, _), Unit::Pawn(_, _)) => true,
         (Unit::Bishop(_), Unit::Bishop(_)) => true,
         (Unit::Knight(_), Unit::Knight(_)) => true,
-        (Unit::Rook(_, _), Unit::Pawn(_, _)) => true,
+        (Unit::Rook(_, _), Unit::Rook(_, _)) => true,
         (Unit::Queen(_), Unit::Queen(_)) => true,
-        (Unit::King(_, _), Unit::Pawn(_, _)) => true,
+        (Unit::King(_, _), Unit::King(_, _)) => true,
         _ => false,
     }
 }
