@@ -7,7 +7,7 @@ mod step;
 mod unit;
 
 pub mod prelude {
-    pub use crate::game::Chess;
+    pub use crate::game::{Chess, GameState};
     pub use crate::pos::Pos;
     pub use crate::side::Side;
     pub use crate::unit::Unit;

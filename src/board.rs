@@ -15,6 +15,11 @@ pub struct Board {
 }
 
 impl Board {
+    /// Creates a new Default [`Board`]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Gives back the [`Unit`] on the given position
     pub fn get_unit(&self, pos: &Pos) -> Option<Unit> {
         if !pos.is_onboard() {

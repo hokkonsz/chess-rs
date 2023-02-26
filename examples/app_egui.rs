@@ -19,7 +19,7 @@ const SPACING: f32 = 2.0;
 const SQUARE_SIZE: f32 = 50.0;
 
 //==================================================
-//=== Application using eGUI
+//=== Application: eGUI
 //==================================================
 
 fn main() {
@@ -39,7 +39,6 @@ impl ChessEguiApp {
         }
     }
 
-    /// Call this in your [`main`] to run a native app provided by the egui crate.
     pub fn run() {
         // setup native app
         let mut options = NativeOptions::default();
@@ -100,7 +99,7 @@ impl App for ChessEguiApp {
         egui::Area::new("Headline")
             .anchor(egui::Align2::CENTER_TOP, [0.0, 25.0])
             .show(ctx, |ui| {
-                let side = format!("{} move!", &self.chess.current_turn);
+                let side = format!("{} move!", &self.chess.get_current_turn());
                 ui.label(RichText::new(side).color(Color32::WHITE).size(28.0));
             });
 
@@ -162,7 +161,7 @@ impl App for ChessEguiApp {
                     });
             });
 
-        self.chess.background_logic();
+        self.chess.game_controller();
 
         egui::CentralPanel::default().show(ctx, |_ui| {});
     }
