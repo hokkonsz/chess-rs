@@ -1,14 +1,11 @@
-mod board;
+mod chess;
 mod game;
 mod pos;
-mod side;
-mod step;
 // mod test;
 mod unit;
 
 pub mod prelude {
-    pub use crate::game::{Chess, GameState};
+    pub use crate::game::{Game, GameState};
     pub use crate::pos::Pos;
-    pub use crate::side::Side;
-    pub use crate::unit::Unit;
+    pub use crate::unit::{Side, Unit};
 }

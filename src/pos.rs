@@ -45,7 +45,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> D5
-    pub fn up(&self) -> Self {
+    pub fn checked_up(&self) -> Self {
         Self {
             x: self.x,
             y: (self.y - 1).clamp(0, BOARD_SIZE - 1),
@@ -53,7 +53,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> C5
-    pub fn up_left(&self) -> Self {
+    pub fn checked_up_left(&self) -> Self {
         Self {
             x: (self.x - 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y - 1).clamp(0, BOARD_SIZE - 1),
@@ -61,7 +61,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> E5
-    pub fn up_right(&self) -> Self {
+    pub fn checked_up_right(&self) -> Self {
         Self {
             x: (self.x + 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y - 1).clamp(0, BOARD_SIZE - 1),
@@ -69,7 +69,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> D3
-    pub fn down(&self) -> Self {
+    pub fn checked_down(&self) -> Self {
         Self {
             x: self.x,
             y: (self.y + 1).clamp(0, BOARD_SIZE - 1),
@@ -77,7 +77,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> C3
-    pub fn down_left(&self) -> Self {
+    pub fn checked_down_left(&self) -> Self {
         Self {
             x: (self.x - 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y + 1).clamp(0, BOARD_SIZE - 1),
@@ -85,7 +85,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> E3
-    pub fn down_right(&self) -> Self {
+    pub fn checked_down_right(&self) -> Self {
         Self {
             x: (self.x + 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y + 1).clamp(0, BOARD_SIZE - 1),
@@ -93,7 +93,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> C4
-    pub fn left(&self) -> Self {
+    pub fn checked_left(&self) -> Self {
         Self {
             x: (self.x - 1).clamp(0, BOARD_SIZE - 1),
             y: self.y,
@@ -101,11 +101,95 @@ impl Pos {
     }
 
     /// E.g. D4 -> E4
-    pub fn right(&self) -> Self {
+    pub fn checked_right(&self) -> Self {
         Self {
             x: (self.x + 1).clamp(0, BOARD_SIZE - 1),
             y: self.y,
         }
+    }
+
+    /// E.g. D4 -> D5
+    pub fn up(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y - 1,
+        }
+    }
+
+    /// E.g. D4 -> C5
+    pub fn up_left(&self) -> Self {
+        Self {
+            x: self.x - 1,
+            y: self.y - 1,
+        }
+    }
+
+    /// E.g. D4 -> E5
+    pub fn up_right(&self) -> Self {
+        Self {
+            x: self.x + 1,
+            y: self.y - 1,
+        }
+    }
+
+    /// E.g. D4 -> D3
+    pub fn down(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y + 1,
+        }
+    }
+
+    /// E.g. D4 -> C3
+    pub fn down_left(&self) -> Self {
+        Self {
+            x: self.x - 1,
+            y: self.y + 1,
+        }
+    }
+
+    /// E.g. D4 -> E3
+    pub fn down_right(&self) -> Self {
+        Self {
+            x: self.x + 1,
+            y: self.y + 1,
+        }
+    }
+
+    /// E.g. D4 -> C4
+    pub fn left(&self) -> Self {
+        Self {
+            x: self.x - 1,
+            y: self.y,
+        }
+    }
+
+    /// E.g. D4 -> E4
+    pub fn right(&self) -> Self {
+        Self {
+            x: self.x + 1,
+            y: self.y,
+        }
+    }
+
+    /// E.g. D4 -> A4
+    pub fn start_row(&self) -> Self {
+        Self { x: 0, y: self.y }
+    }
+
+    /// E.g. D4 -> H4
+    pub fn end_row(&self) -> Self {
+        Self { x: 7, y: self.y }
+    }
+
+    /// E.g. D4 -> D1
+    pub fn start_column(&self) -> Self {
+        Self { x: self.x, y: 0 }
+    }
+
+    /// E.g. D4 -> D8
+    pub fn end_column(&self) -> Self {
+        Self { x: self.x, y: 7 }
     }
 
     /// Produces `Vec<Pos>` between two [`Pos`]

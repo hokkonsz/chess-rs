@@ -1,17 +1,17 @@
 // Chess Crate
-use super::board::Board;
+use super::chess::Board;
 use super::pos::Pos;
-use super::side::Side;
+use super::unit::Side;
 
 //==================================================
-//=== Chess
+//=== Game
 //==================================================
 
 /// * `board_state` current state of the board
 /// * `current_turn` which side to take the next move, either [`Side::Black`] or [`Side::White`]
 /// * `unit_pos` position of the unit we want to move
 /// * `target_pos` target position where we want to move
-pub struct Chess {
+pub struct Game {
     game_state: GameState,
     pub board_state: Board,
     current_turn: Side,
@@ -19,11 +19,11 @@ pub struct Chess {
     pub target_pos: Option<Pos>,
 }
 
-impl Chess {
+impl Game {
     /// Creates a new Chess Game
     pub fn new() -> Self {
-        Chess {
-            game_state: GameState::new(),
+        Game {
+            game_state: GameState::Playing,
             board_state: Board::new(),
             current_turn: Side::White,
             unit_pos: None,
@@ -58,7 +58,7 @@ impl Chess {
                 }
             }
             (Some(unit_pos), Some(target_pos)) => {
-                if self.board_state.step_unit(&unit_pos, &target_pos) {
+                if self.board_state.test_step(&unit_pos, &target_pos) {
                     self.current_turn.swap();
                     println!("{} moves next!", self.current_turn);
                 }
@@ -73,12 +73,5 @@ impl Chess {
 #[derive(Clone, Copy, Debug)]
 pub enum GameState {
     Playing,
-    Ending(Side),
-}
-
-impl GameState {
-    /// Creates a new GameState::Playing
-    fn new() -> Self {
-        GameState::Playing
-    }
+    Ending(Option<Side>),
 }

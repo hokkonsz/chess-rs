@@ -1,6 +1,6 @@
 // Chess Crate
 extern crate chess;
-use chess::game::Chess;
+use chess::game::Game;
 use chess::unit::{Side, Unit};
 
 // UI Crate
@@ -27,14 +27,14 @@ fn main() {
 }
 
 pub struct ChessEguiApp {
-    chess: Chess,
+    chess: Game,
     img_buffer: Vec<RetainedImage>,
 }
 
 impl ChessEguiApp {
     pub fn new() -> Self {
         Self {
-            chess: Chess::new(),
+            chess: Game::new(),
             img_buffer: ChessEguiApp::init(),
         }
     }

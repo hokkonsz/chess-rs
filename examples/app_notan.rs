@@ -6,9 +6,6 @@ use chess::prelude::*;
 use notan::draw::*;
 use notan::prelude::*;
 
-// CHESS
-const UNIT_COUNT: usize = 12;
-
 // SIZES
 const SQUARE_SIZE: f32 = 84.0;
 
@@ -60,7 +57,7 @@ fn main() -> Result<(), String> {
 
 #[derive(AppState)]
 pub struct ChessState {
-    chess: Chess,
+    chess: Game,
     texture_buffer: Vec<Texture>,
     font: Font,
 }
@@ -82,7 +79,7 @@ impl ChessState {
 }
 
 fn init(gfx: &mut Graphics) -> ChessState {
-    let units: [Unit; UNIT_COUNT] = [
+    let units: [Unit; Unit::UNIT_COUNT] = [
         Unit::Pawn(Side::Black, false),
         Unit::Bishop(Side::Black),
         Unit::Knight(Side::Black),
@@ -121,7 +118,7 @@ fn init(gfx: &mut Graphics) -> ChessState {
         .create_font(include_bytes!("res/font/coolvetica_condensed_rg.otf"))
         .unwrap();
 
-    let chess = Chess::new();
+    let chess = Game::new();
 
     ChessState {
         chess,
@@ -140,7 +137,6 @@ fn update(app: &mut App, state: &mut ChessState) {
                     _ => state.chess.target_pos = mouse_to_pos(app.mouse.position()),
                 }
 
-                dbg!(app.mouse.position());
                 state.chess.game_controller();
             }
 
@@ -243,7 +239,10 @@ fn draw(gfx: &mut Graphics, state: &mut ChessState) {
             .fill_color(BACKGROUND)
             .fill();
 
-        let text = format!("{} won!", side);
+        let text = match side {
+            Some(side) => format!("{} won!", side),
+            None => String::from("Draw!"),
+        };
         draw.text(&state.font, &text)
             .position(WIDTH / 2.0, POPUP_TOP + 35.0)
             .size(50.0)
