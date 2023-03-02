@@ -5,8 +5,8 @@ use std::{
 };
 
 const BOARD_SIZE: i8 = 8;
-const UPPERCASE_A: i8 = 65;
-const ZERO: i8 = 48;
+const ASCII_UPPERCASE_A: i8 = 65;
+const ASCII_ZERO: i8 = 48;
 
 //==================================================
 //=== Pos
@@ -27,10 +27,6 @@ impl Pos {
     /// * `y` out of bounds
     pub fn new(x: i8, y: i8) -> Self {
         let pos = Self { x, y };
-
-        if !pos.is_onboard() {
-            panic!("Cant create Pos: {} - Pos Not On Board", pos);
-        }
 
         pos
     }
@@ -303,7 +299,7 @@ impl From<&str> for Pos {
     /// * [`Pos`] would be out of bounds
     fn from(s: &str) -> Self {
         if s.len() != 2 && !s.is_ascii() {
-            panic!("Cant convert from &str: {} - Length != 2 or Not ASCII", s);
+            panic!("Can't convert from &str: {} - Length != 2 or Not ASCII", s);
         }
 
         let col = s.to_ascii_uppercase().as_bytes()[0] as i8;
@@ -311,12 +307,12 @@ impl From<&str> for Pos {
 
         // ASCII Space -> Array Space
         let pos = Self {
-            x: col - UPPERCASE_A,
-            y: BOARD_SIZE - (row - ZERO),
+            x: col - ASCII_UPPERCASE_A,
+            y: BOARD_SIZE - (row - ASCII_ZERO),
         };
 
         if !pos.is_onboard() {
-            panic!("Cant convert from &str: {} - Pos Not On Board", pos);
+            panic!("Can't convert from &str: {} - Pos Not On Board", pos);
         }
 
         pos
@@ -331,7 +327,7 @@ impl From<(i8, i8)> for Pos {
         };
 
         if !pos.is_onboard() {
-            panic!("Cant convert from (i8, i8): {} - Pos Not On Board", pos);
+            panic!("Can't convert from (i8, i8): {} - Pos Not On Board", pos);
         }
 
         pos

@@ -41,6 +41,9 @@ impl Game {
         self.current_turn
     }
 
+    // TODO! Promoting Pawns
+    // TODO! Game Ending -> CheckMate/StaleMate
+
     /// Mutates the `board_state` + `current_turn` based on the value of `unit_pos` and `target_pos`
     ///
     /// Needs to be called after `unit_pos` or `target_pos` changes value.

@@ -168,7 +168,7 @@ fn draw(gfx: &mut Graphics, state: &mut ChessState) {
     let mut y = TOP;
     let mut tile_idx = 0;
 
-    for (board_y, row) in state.chess.board_state.square.into_iter().enumerate() {
+    for (board_y, row) in state.chess.board_state.squares.into_iter().enumerate() {
         for (board_x, col) in row.into_iter().enumerate() {
             // Board Tile
             if tile_idx % 2 == 0 {

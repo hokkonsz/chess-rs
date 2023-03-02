@@ -1,7 +1,6 @@
 // Chess Crate
 extern crate chess;
-use chess::game::Game;
-use chess::unit::{Side, Unit};
+use chess::prelude::*;
 
 // UI Crate
 use eframe::egui::{Color32, Response, RichText};
@@ -10,8 +9,6 @@ use eframe::{egui, App, NativeOptions};
 use egui_extras::image::FitTo;
 use egui_extras::RetainedImage;
 
-// CHESS
-const UNIT_COUNT: usize = 12;
 // SIZES
 const WIDTH: f32 = 1024.0;
 const HEIGHT: f32 = 860.0;
@@ -23,6 +20,8 @@ const SQUARE_SIZE: f32 = 50.0;
 //==================================================
 
 fn main() {
+    env::set_var("RUST_BACKTRACE", "1");
+
     ChessEguiApp::run()
 }
 
@@ -55,7 +54,7 @@ impl ChessEguiApp {
 
     /// Used to load the SVG images into `img_buffer` in [`ChessApp`]
     fn init() -> Vec<RetainedImage> {
-        let units: [Unit; UNIT_COUNT] = [
+        let units: [Unit; Unit::UNIT_COUNT] = [
             Unit::Pawn(Side::Black, false),
             Unit::Bishop(Side::Black),
             Unit::Knight(Side::Black),
@@ -125,7 +124,7 @@ impl App for ChessEguiApp {
                         ui.end_row();
 
                         let mut row_num = 8;
-                        for (y_pos, row) in self.chess.board_state.square.into_iter().enumerate() {
+                        for (y_pos, row) in self.chess.board_state.squares.into_iter().enumerate() {
                             let side = format!("   {}", row_num);
                             ui.label(RichText::new(side).color(Color32::WHITE).size(18.0));
                             row_num -= 1;
@@ -146,10 +145,12 @@ impl App for ChessEguiApp {
 
                                 if response.clicked() {
                                     if self.chess.unit_pos.is_none() {
-                                        self.chess.unit_pos = Some((x_pos, y_pos).into());
+                                        self.chess.unit_pos =
+                                            Some((x_pos as i8, y_pos as i8).into());
                                         println!("{:?}", self.chess.unit_pos);
                                     } else if self.chess.target_pos.is_none() {
-                                        self.chess.target_pos = Some((x_pos, y_pos).into());
+                                        self.chess.target_pos =
+                                            Some((x_pos as i8, y_pos as i8).into());
                                         println!("{:?}", self.chess.target_pos);
                                     }
                                 }
