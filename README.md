@@ -4,7 +4,7 @@ The system is currently playable with some missing features. (See [TODO](https:/
 
 ### Game Controller
 
-The whole system functioning through the game controller. It takes two inputs Position 1 and Position 2. At Position 1 we should find a valid Unit, which we want to move to Position 2, to the Target Position. The controller evaluates the Unit and the Target Positions and mutates the board based on the results.
+The system can be controller through the game controller function. It takes two inputs Position 1 and Position 2. At Position 1 we should find a valid Unit, which we want to move to Position 2 to the Target Position. Then the controller evaluates the Unit's Type and the Target Position and mutates the board based on the results.
 
 ### Chess Space to Array Space
 
@@ -18,18 +18,61 @@ For example, the .to function produces a vector, which contains all the Position
 
 ### Unit Step
 
-To calculate each Step we are using basic math, where we substract the Unit's Position from the Target Positions. Furthermore there are additional conditions to each Step
+To validate a Step we are using basic math, where we substract the Unit's Position from the Target's Position. Furthermore there are additional conditions to each Step. The whole Step System is build around the Type State Pattern, which in my mind really fits the process. (Or maybe I just really wanted to try my hands on this pattern.)
 
-![pawn1](https://user-images.githubusercontent.com/54407548/222507843-4c2b0444-4f25-4a0c-97e4-d6ae3d8422b1.png)
-![pawn2](https://user-images.githubusercontent.com/54407548/222508482-ca5d858c-37f0-4003-92eb-f05cf7c6861f.png)
+There are 4 differen States to a Step.
+
+ConditionState
+
+  - Where we can add Conditions like Unit is not a King at Position or Unit is an Enemy at Position.
+  - We can also add Actions like Move/Remove. This can be usefull for special cases like En passant or Castling, where we want to do more than one thing.
+  
+ResultState
+
+  - This state holds information about the evaluation process.
+  - In the ResultState we can execute the Actions.
+
+ImageState
+
+  - This State holds information about the former state of the board, so we can reconstruct the old state if necessary.
+
+![image](https://user-images.githubusercontent.com/54407548/222757554-b7e2d55b-bfaa-4bf3-acfe-6484504c4c10.png)
+
+The pictures below show the calculations for each unit.
+
+#### Pawn
+
+![pawn1](https://user-images.githubusercontent.com/54407548/222733817-f5a123cb-bff9-4d3f-a3bb-df5285629359.png)
+![pawn2](https://user-images.githubusercontent.com/54407548/222733874-f24068a6-9f42-4789-a47f-3b12ec12fa51.png)
+
+#### Bishop
+
+![bishop](https://user-images.githubusercontent.com/54407548/222734732-9f297558-9a30-49b9-93c1-f3a34f80a2a4.png)
+
+#### Knight
+
+![knight](https://user-images.githubusercontent.com/54407548/222733908-1070d758-a48d-4416-b58c-e35dd2ea42f6.png)
+
+#### Rook
+
+![rook](https://user-images.githubusercontent.com/54407548/222734704-822fd637-18ba-4730-8114-c703460fc85b.png)
+
+#### Queen
+
+![queen](https://user-images.githubusercontent.com/54407548/222734634-ca94a7c9-cf55-4986-a77a-102419eceef1.png)
+
+#### King
+
+![king1](https://user-images.githubusercontent.com/54407548/222734566-17bd67bf-4162-4017-bcfc-a82e0bcf61f7.png)
+![king2](https://user-images.githubusercontent.com/54407548/222734582-b2a28bb2-18c8-46b4-852c-cb94b8f33a21.png)
 
 ### Examples
 
-Currently there are two examples to test out the system, one of them is using eGUI and the other one is using notan. Right now I'm more focused on notan, which I can easily recommend to anyone, who wants to quickly implement and test stuff.
+Currently there are two examples to test out the system, one of them is using eGUI and the other one is using notan. Right now I'm more focused on notan, which I can gladly recommend to anyone, who wants to quickly implement and test out things in Rust.
 
 ### TODO
 
-There are some missing features and future plans.
+List of missing features and future plans.
 
 * CheckMate / StaleMate
 * Promote Unit
