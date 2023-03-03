@@ -197,3 +197,43 @@ impl From<Side> for &str {
         }
     }
 }
+
+//==================================================
+//=== Unit Testing
+//==================================================
+
+#[cfg(test)]
+mod tests_unit {
+    use super::*;
+
+    #[test]
+    fn test_moved() {
+        let unit = Unit::Pawn(Side::Black, true);
+        assert!(unit.is_moved());
+
+        let unit = unit.set_moved(false);
+        assert!(!unit.is_moved());
+
+        let unit = Unit::Knight(Side::White);
+        assert!(!unit.is_moved());
+    }
+
+    #[test]
+    fn test_unit_type() {
+        let unit1 = Unit::Pawn(Side::Black, true);
+        let mut unit2 = Unit::Pawn(Side::Black, true);
+        assert_eq!(eq_unit_type(&unit1, &unit2), true);
+
+        unit2 = Unit::Pawn(Side::Black, false);
+        assert_eq!(eq_unit_type(&unit1, &unit2), true);
+
+        unit2 = Unit::Pawn(Side::White, true);
+        assert_eq!(eq_unit_type(&unit1, &unit2), true);
+
+        unit2 = Unit::Pawn(Side::White, false);
+        assert_eq!(eq_unit_type(&unit1, &unit2), true);
+
+        unit2 = Unit::Rook(Side::Black, true);
+        assert_eq!(eq_unit_type(&unit1, &unit2), false);
+    }
+}

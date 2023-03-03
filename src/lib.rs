@@ -1,7 +1,7 @@
 mod chess;
 mod game;
 mod pos;
-// mod test;
+
 mod unit;
 
 pub mod prelude {

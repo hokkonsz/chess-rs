@@ -912,3 +912,180 @@ impl StepImage {
         Self { unit, pos }
     }
 }
+
+//==================================================
+//=== Unit Testing
+//==================================================
+
+#[cfg(test)]
+mod tests_step {
+    use super::*;
+
+    #[test]
+    fn test_no_condition() {
+        let step = Step::new(true);
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, Some(0));
+    }
+
+    #[test]
+    fn test_invalid() {
+        let mut step = Step::new(false);
+
+        // [Group 0:] H2 -> Pawn
+        step.add_cond_pos_is_none("H2".into());
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(!step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, None);
+    }
+
+    #[test]
+    fn test_empty1() {
+        let mut step = Step::new(true);
+
+        // [Group 0:] H2 -> Empty
+        step.add_cond_pos_is_none("D4".into());
+
+        // [Group 1:] H2 -> Pawn
+        step.next_group();
+        step.add_cond_pos_is_none("H2".into());
+
+        // [Group 2:] D8 -> Queen
+        step.next_group();
+        step.add_cond_pos_is_none("D8".into());
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, Some(0));
+    }
+
+    #[test]
+    fn test_empty2() {
+        let mut step = Step::new(true);
+
+        // [Group 0:] H2 -> Pawn
+        step.add_cond_pos_is_none("H2".into());
+
+        // [Group 1:] E1 -> King
+        step.next_group();
+        step.add_cond_pos_is_none("E1".into());
+
+        // [Group 2:] D8 -> Queen
+        step.next_group();
+        step.add_cond_pos_is_none("D8".into());
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(!step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, None);
+    }
+
+    #[test]
+    fn test_empty3() {
+        let mut step = Step::new(true);
+
+        // [Group 0:] H2 -> Pawn | A2 -> Pawn
+        step.add_cond_pos_is_none("H2".into());
+        step.add_cond_pos_is_none("A2".into());
+
+        // [Group 1:] D4 -> Empty | H2 -> Empty | D8 -> Empty
+        step.next_group();
+        step.add_cond_pos_is_none("D4".into());
+        step.add_cond_pos_is_none("H4".into());
+        step.add_cond_pos_is_none("D4".into());
+
+        // [Group 2:] D4 -> Empty | H4 -> Empty | A2 -> Pawn
+        step.next_group();
+        step.add_cond_pos_is_none("D4".into());
+        step.add_cond_pos_is_none("H4".into());
+        step.add_cond_pos_is_none("A2".into());
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, Some(1));
+    }
+
+    #[test]
+    fn test_empty_group1() {
+        let mut step = Step::new(true);
+
+        // Add group should do nothing here!
+        step.next_group();
+
+        // [Group 0:] D4 -> Empty | H2 -> Pawn | E4 -> Empty
+        step.add_cond_pos_is_none("D4".into());
+        step.add_cond_pos_is_none("H2".into());
+        step.add_cond_pos_is_none("E4".into());
+
+        // [Group 1:] D4 -> Empty | H4 -> Empty | A4 -> Empty
+        step.next_group();
+        step.add_cond_pos_is_none("D4".into());
+        step.add_cond_pos_is_none("H4".into());
+        step.add_cond_pos_is_none("A4".into());
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, Some(1));
+    }
+
+    #[test]
+    fn test_empty_group2() {
+        let mut step = Step::new(true);
+
+        // [Group 0:] D4 -> Empty | H2 -> Pawn | e4 -> Empty
+        step.next_group();
+        step.add_cond_pos_is_none("D4".into());
+        step.add_cond_pos_is_none("H2".into());
+        step.add_cond_pos_is_none("E4".into());
+
+        // [Group 1:] D4 -> Empty | E2 -> Pawn
+        step.next_group();
+        step.add_cond_pos_is_none("D4".into());
+        step.add_cond_pos_is_none("E2".into());
+
+        // [Group 2:] Empty Group
+        step.next_group();
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(!step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, None);
+    }
+
+    #[test]
+    fn test_last_condition_valid() {
+        let mut step = Step::new(true);
+
+        // [Group 0:] B8 -> Black Knight
+        step.add_cond_pos_is_enemy("B8".into(), &Side::Black);
+
+        // [Group 1:] B1 -> White Knight
+        step.next_group();
+        step.add_cond_pos_is_enemy_or_none("B1".into(), &Side::White);
+
+        // [Group 2:] F7 -> Pawn
+        step.next_group();
+        step.add_cond_pos_is_none("F7".into());
+
+        // [Group 3:] E8 -> King
+        step.next_group();
+        step.add_cond_pos_not_king("E8".into());
+
+        // [Group 4:] H8 -> Rook (Moved = false)
+        step.next_group();
+        step.add_cond_pos_not_moved("H8".into());
+
+        let step = step.evaluate(&Board::default());
+
+        assert!(step.is_valid());
+        assert_eq!(step.condition_state.step_result.group_id, Some(4));
+    }
+}

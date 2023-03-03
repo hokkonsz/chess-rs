@@ -333,3 +333,121 @@ impl From<(i8, i8)> for Pos {
         pos
     }
 }
+
+//==================================================
+//=== Unit Testing: Pos
+//==================================================
+
+#[cfg(test)]
+mod tests_pos {
+    use crate::pos::Pos;
+
+    #[test]
+    fn test_up() {
+        assert_eq!(Pos::from("D5"), Pos::from("D4").up());
+    }
+
+    #[test]
+    fn test_up_left() {
+        assert_eq!(Pos::from("C5"), Pos::from("D4").up_left());
+    }
+
+    #[test]
+    fn test_up_right() {
+        assert_eq!(Pos::from("E5"), Pos::from("D4").up_right());
+    }
+
+    #[test]
+    fn test_down() {
+        assert_eq!(Pos::from("D3"), Pos::from("D4").down());
+    }
+
+    #[test]
+    fn test_down_left() {
+        assert_eq!(Pos::from("C3"), Pos::from("D4").down_left());
+    }
+
+    #[test]
+    fn test_down_right() {
+        assert_eq!(Pos::from("E3"), Pos::from("D4").down_right());
+    }
+
+    #[test]
+    fn test_left() {
+        assert_eq!(Pos::from("C4"), Pos::from("D4").left());
+    }
+
+    #[test]
+    fn test_right() {
+        assert_eq!(Pos::from("E4"), Pos::from("D4").right());
+    }
+
+    #[test]
+    fn test_checked() {
+        assert_eq!(Pos::from("D8"), Pos::from("D8").checked_up());
+        assert_eq!(Pos::from("H4"), Pos::from("H4").checked_right());
+    }
+
+    #[test]
+    fn test_non_checked() {
+        assert_eq!(Pos::new(3, -1), Pos::from("D8").up());
+        assert_eq!(Pos::new(8, 4), Pos::from("H4").right());
+    }
+
+    //===========
+
+    #[test]
+    fn test_to1() {
+        assert_eq!(Pos::from("D2").to(&Pos::from("D2")), vec![]);
+    }
+
+    #[test]
+    fn test_to2() {
+        assert_eq!(Pos::from("D2").to(&Pos::from("E4")), vec![]);
+    }
+
+    #[test]
+    fn test_to3() {
+        assert_eq!(
+            Pos::from("D5").to(&Pos::from("G8")),
+            vec!["E6".into(), "F7".into()]
+        );
+    }
+
+    #[test]
+    fn test_to4() {
+        assert_eq!(
+            Pos::from("H1").to(&Pos::from("A1")),
+            vec![
+                "G1".into(),
+                "F1".into(),
+                "E1".into(),
+                "D1".into(),
+                "C1".into(),
+                "B1".into(),
+            ]
+        );
+    }
+
+    //===========
+
+    #[test]
+    fn test_fromstr1() {
+        assert_eq!(Pos::from("D5"), Pos::new(3, 3));
+    }
+
+    #[test]
+    fn test_fromstr2() {
+        assert_eq!(Pos::from("E6"), Pos::new(4, 2));
+    }
+
+    #[test]
+    fn test_fromstr3() {
+        assert_eq!(Pos::from("F7"), Pos::new(5, 1));
+    }
+
+    #[test]
+    fn test_fromstr4() {
+        assert_eq!(Pos::from("G8"), Pos::new(6, 0));
+    }
+}
