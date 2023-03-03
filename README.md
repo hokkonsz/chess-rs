@@ -42,8 +42,8 @@ The pictures below show the calculations for each unit.
 
 #### Pawn
 
-![pawn1](https://user-images.githubusercontent.com/54407548/222733817-f5a123cb-bff9-4d3f-a3bb-df5285629359.png)
-![pawn2](https://user-images.githubusercontent.com/54407548/222733874-f24068a6-9f42-4789-a47f-3b12ec12fa51.png)
+![pawn1](https://user-images.githubusercontent.com/54407548/222778356-2c743059-a499-40d6-bd10-241bec08502b.png)
+![pawn2](https://user-images.githubusercontent.com/54407548/222778371-fa3129c1-d744-41ef-b72a-fae912c1e0cf.png)
 
 #### Bishop
 
