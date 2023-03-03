@@ -57,8 +57,8 @@ The pictures below show the calculations for each unit.
 
 #### King
 
-![king1](https://user-images.githubusercontent.com/54407548/222734566-17bd67bf-4162-4017-bcfc-a82e0bcf61f7.png)
-![king2](https://user-images.githubusercontent.com/54407548/222734582-b2a28bb2-18c8-46b4-852c-cb94b8f33a21.png)
+![king1](https://user-images.githubusercontent.com/54407548/222780674-704aa34f-d09b-4032-bff7-7bb0c6a2573b.png)
+![king2](https://user-images.githubusercontent.com/54407548/222780691-7391bbf3-15c9-455e-bf1e-0ae1ff6859ed.png)
 
 ### Examples
 
