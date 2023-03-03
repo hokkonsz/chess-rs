@@ -1,6 +1,6 @@
 # chess-rs
 
-The system is currently playable with some missing features. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
+A simple chess system written in Rust. The system is currently playable with some missing features. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
 
 ### Game Controller
 
