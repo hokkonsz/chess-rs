@@ -45,21 +45,15 @@ The pictures below show the calculations for each unit.
 ![pawn1](https://user-images.githubusercontent.com/54407548/222778356-2c743059-a499-40d6-bd10-241bec08502b.png)
 ![pawn2](https://user-images.githubusercontent.com/54407548/222778371-fa3129c1-d744-41ef-b72a-fae912c1e0cf.png)
 
-#### Bishop
+#### Bishop/Rook
 
-![bishop](https://user-images.githubusercontent.com/54407548/222734732-9f297558-9a30-49b9-93c1-f3a34f80a2a4.png)
+![bishop](https://user-images.githubusercontent.com/54407548/222780200-4f19aac3-d079-4867-bf85-ba1659031cbb.png)
+![rook](https://user-images.githubusercontent.com/54407548/222780213-85fd7dcb-4304-4896-b6ce-ecc2309f9473.png)
 
-#### Knight
+#### Knight/Queen
 
-![knight](https://user-images.githubusercontent.com/54407548/222733908-1070d758-a48d-4416-b58c-e35dd2ea42f6.png)
-
-#### Rook
-
-![rook](https://user-images.githubusercontent.com/54407548/222734704-822fd637-18ba-4730-8114-c703460fc85b.png)
-
-#### Queen
-
-![queen](https://user-images.githubusercontent.com/54407548/222734634-ca94a7c9-cf55-4986-a77a-102419eceef1.png)
+![knight](https://user-images.githubusercontent.com/54407548/222780243-61bf9e0d-1b8e-496e-b717-7ee68c579b43.png)
+![queen](https://user-images.githubusercontent.com/54407548/222780263-1e5df148-191c-44a3-9c6f-51ced47632f6.png)
 
 #### King
 
