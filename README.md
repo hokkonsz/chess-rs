@@ -1,4 +1,7 @@
-# chess-rs
+
+# ♟ chess-rs
+
+[![dependency status](https://deps.rs/repo/github/hokkonsz/chess-rs/status.svg)](https://deps.rs/repo/github/hokkonsz/chess-rs)
 
 A simple chess system written in Rust. The system is currently playable with some missing features. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
 
