@@ -1,6 +1,9 @@
-# chess-rs
 
-A simple chess system written in Rust. The system is currently playable with some missing features. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
+# ♟ chess-rs
+
+[![dependency status](https://deps.rs/repo/github/hokkonsz/chess-rs/status.svg)](https://deps.rs/repo/github/hokkonsz/chess-rs)
+
+A simple chess system written in Rust. The project is still in work in progress, you can find the missing features below. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
 
 ### Game Controller
 
@@ -14,13 +17,13 @@ For user-friendly usability we can produce Positions from Chess Notations.
 
 For example, the .to function produces a vector, which contains all the Positions between two Positions excluding the starting and ending Positions.
 
-![fn_to](https://user-images.githubusercontent.com/54407548/222519034-80bf5fd8-3aac-49d1-ba7d-6fd92fa4b655.png)
+![fn_to](https://user-images.githubusercontent.com/54407548/227720806-6289e3a0-cb82-4114-b210-20e116476e9f.png)
 
 ### Unit Step
 
 To validate a Step we are using basic math, where we substract the Unit's Position from the Target's Position. Furthermore there are additional conditions to each Step. The whole Step System is build around the Type State Pattern, which in my mind really fits the process. (Or maybe I just really wanted to try my hands on this pattern.)
 
-There are 4 differen States to a Step.
+There are 3 different States to a Step.
 
 ConditionState
 
@@ -42,33 +45,37 @@ The pictures below show the calculations for each unit.
 
 #### Pawn
 
-![pawn1](https://user-images.githubusercontent.com/54407548/222733817-f5a123cb-bff9-4d3f-a3bb-df5285629359.png)
-![pawn2](https://user-images.githubusercontent.com/54407548/222733874-f24068a6-9f42-4789-a47f-3b12ec12fa51.png)
+![pawn1](https://user-images.githubusercontent.com/54407548/222778356-2c743059-a499-40d6-bd10-241bec08502b.png)
+![pawn2](https://user-images.githubusercontent.com/54407548/222778371-fa3129c1-d744-41ef-b72a-fae912c1e0cf.png)
 
-#### Bishop
+#### Bishop/Rook
 
-![bishop](https://user-images.githubusercontent.com/54407548/222734732-9f297558-9a30-49b9-93c1-f3a34f80a2a4.png)
+![bishop](https://user-images.githubusercontent.com/54407548/222780200-4f19aac3-d079-4867-bf85-ba1659031cbb.png)
+![rook](https://user-images.githubusercontent.com/54407548/222780213-85fd7dcb-4304-4896-b6ce-ecc2309f9473.png)
 
-#### Knight
+#### Knight/Queen
 
-![knight](https://user-images.githubusercontent.com/54407548/222733908-1070d758-a48d-4416-b58c-e35dd2ea42f6.png)
-
-#### Rook
-
-![rook](https://user-images.githubusercontent.com/54407548/222734704-822fd637-18ba-4730-8114-c703460fc85b.png)
-
-#### Queen
-
-![queen](https://user-images.githubusercontent.com/54407548/222734634-ca94a7c9-cf55-4986-a77a-102419eceef1.png)
+![knight](https://user-images.githubusercontent.com/54407548/222780243-61bf9e0d-1b8e-496e-b717-7ee68c579b43.png)
+![queen](https://user-images.githubusercontent.com/54407548/222780263-1e5df148-191c-44a3-9c6f-51ced47632f6.png)
 
 #### King
 
-![king1](https://user-images.githubusercontent.com/54407548/222734566-17bd67bf-4162-4017-bcfc-a82e0bcf61f7.png)
-![king2](https://user-images.githubusercontent.com/54407548/222734582-b2a28bb2-18c8-46b4-852c-cb94b8f33a21.png)
+![king1](https://user-images.githubusercontent.com/54407548/222780674-704aa34f-d09b-4032-bff7-7bb0c6a2573b.png)
+![king2](https://user-images.githubusercontent.com/54407548/222780691-7391bbf3-15c9-455e-bf1e-0ae1ff6859ed.png)
 
 ### Examples
 
 Currently there are two examples to test out the system, one of them is using eGUI and the other one is using notan. Right now I'm more focused on notan, which I can gladly recommend to anyone, who wants to quickly implement and test out things in Rust.
+
+```bash
+cargo run --example app_notan
+```
+
+or
+
+```bash
+cargo run --example app_egui
+```
 
 ### TODO
 
