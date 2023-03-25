@@ -20,8 +20,6 @@ const SQUARE_SIZE: f32 = 50.0;
 //==================================================
 
 fn main() {
-    env::set_var("RUST_BACKTRACE", "1");
-
     ChessEguiApp::run()
 }
 
@@ -39,7 +37,6 @@ impl ChessEguiApp {
     }
 
     pub fn run() {
-        // setup native app
         let mut options = NativeOptions::default();
         options.initial_window_size = Some(Vec2::new(WIDTH, HEIGHT));
         options.resizable = false;
@@ -49,10 +46,9 @@ impl ChessEguiApp {
             "Chess",
             options,
             Box::new(|_cc| Box::new(ChessEguiApp::new())),
-        )
+        );
     }
 
-    /// Used to load the SVG images into `img_buffer` in [`ChessApp`]
     fn init() -> Vec<RetainedImage> {
         let units: [Unit; Unit::UNIT_COUNT] = [
             Unit::Pawn(Side::Black, false),
@@ -87,7 +83,7 @@ impl ChessEguiApp {
                 .unwrap(),
             );
 
-            println!("Images loaded: {}/{}", i + 1, UNIT_COUNT);
+            println!("Images loaded: {}/{}", i + 1, Unit::UNIT_COUNT);
         }
 
         img_buffer
