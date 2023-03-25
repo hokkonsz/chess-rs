@@ -3,7 +3,7 @@
 
 [![dependency status](https://deps.rs/repo/github/hokkonsz/chess-rs/status.svg)](https://deps.rs/repo/github/hokkonsz/chess-rs)
 
-A simple chess system written in Rust. The system is currently playable with some missing features. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
+A simple chess system written in Rust. The project is still in work in progress, you can find the missing features below. (See [TODO](https://github.com/hokkonsz/chess-rs/edit/main/README.md#todo "TODO"))
 
 ### Game Controller
 
@@ -17,13 +17,13 @@ For user-friendly usability we can produce Positions from Chess Notations.
 
 For example, the .to function produces a vector, which contains all the Positions between two Positions excluding the starting and ending Positions.
 
-![fn_to](https://user-images.githubusercontent.com/54407548/222775625-96354bb8-a068-4729-8eb7-e8702c069f63.png)
+![fn_to](https://user-images.githubusercontent.com/54407548/227720806-6289e3a0-cb82-4114-b210-20e116476e9f.png)
 
 ### Unit Step
 
 To validate a Step we are using basic math, where we substract the Unit's Position from the Target's Position. Furthermore there are additional conditions to each Step. The whole Step System is build around the Type State Pattern, which in my mind really fits the process. (Or maybe I just really wanted to try my hands on this pattern.)
 
-There are 4 differen States to a Step.
+There are 3 different States to a Step.
 
 ConditionState
 
@@ -66,6 +66,16 @@ The pictures below show the calculations for each unit.
 ### Examples
 
 Currently there are two examples to test out the system, one of them is using eGUI and the other one is using notan. Right now I'm more focused on notan, which I can gladly recommend to anyone, who wants to quickly implement and test out things in Rust.
+
+```bash
+cargo run --example app_notan
+```
+
+or
+
+```bash
+cargo run --example app_egui
+```
 
 ### TODO
 
