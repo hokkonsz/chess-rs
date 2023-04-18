@@ -20,12 +20,49 @@ pub struct Pos {
 }
 
 impl Pos {
+    pub const ALL_DIRECTIONS: [&dyn Fn(&Self) -> Self; 8] = [
+        &Self::up,
+        &Self::up_left,
+        &Self::up_right,
+        &Self::down,
+        &Self::down_left,
+        &Self::down_right,
+        &Self::left,
+        &Self::right,
+    ];
+
+    pub const DIAGNOAL: [&dyn Fn(&Self) -> Self; 4] = [
+        &Self::up_left,
+        &Self::up_right,
+        &Self::down_left,
+        &Self::down_right,
+    ];
+
+    pub const CROSS: [&dyn Fn(&Self) -> Self; 4] = [
+        &Self::up,
+        &Self::down,
+        &Self::left,
+        &Self::right, //
+    ];
+
+    pub const UPWARD: [&dyn Fn(&Self) -> Self; 3] = [
+        &Self::up,
+        &Self::up_left,
+        &Self::up_right, //
+    ];
+
+    pub const DOWNWARD: [&dyn Fn(&Self) -> Self; 3] = [
+        &Self::down,
+        &Self::down_left,
+        &Self::down_right, //
+    ];
+
     /// Creates a new [`Pos`] if x and y is on the board
     ///
     /// Panics when...
     /// * `x` out of bounds
     /// * `y` out of bounds
-    pub fn new(x: i8, y: i8) -> Self {
+    pub const fn new(x: i8, y: i8) -> Self {
         let pos = Self { x, y };
 
         pos
@@ -41,7 +78,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> D5
-    pub fn checked_up(&self) -> Self {
+    pub fn bounded_up(&self) -> Self {
         Self {
             x: self.x,
             y: (self.y - 1).clamp(0, BOARD_SIZE - 1),
@@ -49,7 +86,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> C5
-    pub fn checked_up_left(&self) -> Self {
+    pub fn bounded_up_left(&self) -> Self {
         Self {
             x: (self.x - 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y - 1).clamp(0, BOARD_SIZE - 1),
@@ -57,7 +94,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> E5
-    pub fn checked_up_right(&self) -> Self {
+    pub fn bounded_up_right(&self) -> Self {
         Self {
             x: (self.x + 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y - 1).clamp(0, BOARD_SIZE - 1),
@@ -65,7 +102,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> D3
-    pub fn checked_down(&self) -> Self {
+    pub fn bounded_down(&self) -> Self {
         Self {
             x: self.x,
             y: (self.y + 1).clamp(0, BOARD_SIZE - 1),
@@ -73,7 +110,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> C3
-    pub fn checked_down_left(&self) -> Self {
+    pub fn bounded_down_left(&self) -> Self {
         Self {
             x: (self.x - 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y + 1).clamp(0, BOARD_SIZE - 1),
@@ -81,7 +118,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> E3
-    pub fn checked_down_right(&self) -> Self {
+    pub fn bounded_down_right(&self) -> Self {
         Self {
             x: (self.x + 1).clamp(0, BOARD_SIZE - 1),
             y: (self.y + 1).clamp(0, BOARD_SIZE - 1),
@@ -89,7 +126,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> C4
-    pub fn checked_left(&self) -> Self {
+    pub fn bounded_left(&self) -> Self {
         Self {
             x: (self.x - 1).clamp(0, BOARD_SIZE - 1),
             y: self.y,
@@ -97,7 +134,7 @@ impl Pos {
     }
 
     /// E.g. D4 -> E4
-    pub fn checked_right(&self) -> Self {
+    pub fn bounded_right(&self) -> Self {
         Self {
             x: (self.x + 1).clamp(0, BOARD_SIZE - 1),
             y: self.y,
@@ -170,22 +207,34 @@ impl Pos {
 
     /// E.g. D4 -> A4
     pub fn start_row(&self) -> Self {
-        Self { x: 0, y: self.y }
+        Self {
+            x: 0,
+            y: self.y, //
+        }
     }
 
     /// E.g. D4 -> H4
     pub fn end_row(&self) -> Self {
-        Self { x: 7, y: self.y }
+        Self {
+            x: 7,
+            y: self.y, //
+        }
     }
 
     /// E.g. D4 -> D1
     pub fn start_column(&self) -> Self {
-        Self { x: self.x, y: 0 }
+        Self {
+            x: self.x,
+            y: 0, //
+        }
     }
 
     /// E.g. D4 -> D8
     pub fn end_column(&self) -> Self {
-        Self { x: self.x, y: 7 }
+        Self {
+            x: self.x,
+            y: 7, //
+        }
     }
 
     /// Produces `Vec<Pos>` between two [`Pos`]
@@ -384,8 +433,8 @@ mod tests_pos {
 
     #[test]
     fn test_checked() {
-        assert_eq!(Pos::from("D8"), Pos::from("D8").checked_up());
-        assert_eq!(Pos::from("H4"), Pos::from("H4").checked_right());
+        assert_eq!(Pos::from("D8"), Pos::from("D8").bounded_up());
+        assert_eq!(Pos::from("H4"), Pos::from("H4").bounded_right());
     }
 
     #[test]

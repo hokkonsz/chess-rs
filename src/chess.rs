@@ -31,9 +31,7 @@ impl Board {
         }
     }
 
-    /// Returns the [`Pos`] of the King for the given `side`
-    ///
-    /// If there is no King for this `side`, then returns `None`
+    /// Sets the [`Pos`] of the King for the given `side`
     fn set_king_pos(&mut self, side: &Side, pos: Pos) {
         match side {
             Side::Black => self.black_king_pos = Some(pos),
@@ -70,6 +68,25 @@ impl Board {
         }
 
         self.squares[pos.y as usize][pos.x as usize] = None;
+    }
+
+    /// Promotes [`Unit`] to `Queen`, when...
+    /// * The type of the [`Unit`] is `Pawn`
+    /// * [`Unit`] can be found in the first or the last row
+    fn promote(&mut self, pos: Pos) {
+        if !pos.is_onboard() {
+            panic!("Cant set unit on Pos: {} - Pos Not On Board", pos);
+        }
+
+        if pos.y != 0 && pos.y != 7 {
+            return;
+        }
+
+        if let Some(unit) = self.squares[pos.y as usize][pos.x as usize] {
+            if eq_unit_type(&unit, &Unit::PAWN) {
+                self.squares[pos.y as usize][pos.x as usize] = Some(unit.change_type(&Unit::QUEEN));
+            }
+        }
     }
 
     /// Mutates [`Board`] when called with a viable step
@@ -123,8 +140,8 @@ impl Board {
 
         // Validate Step Direction
         match side {
-            Side::Black if calc_pos.y > 0 => offset_pos = target_pos.checked_up(),
-            Side::White if calc_pos.y < 0 => offset_pos = target_pos.checked_down(),
+            Side::Black if calc_pos.y > 0 => offset_pos = target_pos.bounded_up(),
+            Side::White if calc_pos.y < 0 => offset_pos = target_pos.bounded_down(),
             _ => return step,
         };
 
@@ -160,6 +177,7 @@ impl Board {
             step.add_cond_pos_not_king(*target_pos);
 
             step.add_action_move(*unit_pos, *target_pos);
+            step.add_action_promote(*target_pos);
 
             // En Passant
             step.next_group();
@@ -170,6 +188,8 @@ impl Board {
             step.add_action_remove(offset_pos);
             step.add_action_move(*unit_pos, *target_pos);
         }
+
+        step.add_action_promote(*target_pos);
 
         step
     }
@@ -285,7 +305,7 @@ impl Board {
                 step.add_cond_pos_not_moved(target_pos.start_row());
 
                 step.add_action_move(*unit_pos, *target_pos);
-                step.add_action_move(target_pos.start_row(), target_pos.checked_right());
+                step.add_action_move(target_pos.start_row(), target_pos.bounded_right());
             }
             // Castle Right E.g. E1 -> G1
             else if calc_pos.x == 2 && !moved {
@@ -297,7 +317,7 @@ impl Board {
                 step.add_cond_pos_not_moved(target_pos.end_row());
 
                 step.add_action_move(*unit_pos, *target_pos);
-                step.add_action_move(target_pos.end_row(), target_pos.checked_left());
+                step.add_action_move(target_pos.end_row(), target_pos.bounded_left());
             }
         }
 
@@ -314,44 +334,11 @@ impl Board {
         }
         let king_pos = king_pos.unwrap();
 
-        // Up
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::up) {
-            positions.push(pos)
-        }
-
-        // Up Right
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::up_right) {
-            positions.push(pos)
-        }
-
-        // Up Left
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::up_left) {
-            positions.push(pos)
-        }
-
-        // Down
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::down) {
-            positions.push(pos)
-        }
-
-        // Down Left
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::down_left) {
-            positions.push(pos)
-        }
-
-        // Down Right
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::down_right) {
-            positions.push(pos)
-        }
-
-        // Left
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::left) {
-            positions.push(pos)
-        }
-
-        // Right
-        if let Some(pos) = self.find_unit_direction(king_pos, &Pos::right) {
-            positions.push(pos)
+        // Directions
+        for direction in Pos::ALL_DIRECTIONS {
+            if let Some(pos) = self.find_unit_direction(king_pos, direction) {
+                positions.push(pos)
+            }
         }
 
         // Knights
@@ -402,8 +389,7 @@ impl Board {
     ///
     /// Returns a vector, which contains all of the Knights found
     fn find_knights(&self, pos: Pos) -> Vec<Pos> {
-        let mut positions = Vec::new();
-        let offset_positions: [Pos; 8] = [
+        const KNIGHT_OFFSETS: [Pos; 8] = [
             Pos::new(-2, 1),
             Pos::new(-1, 2),
             Pos::new(1, 2),
@@ -414,7 +400,9 @@ impl Board {
             Pos::new(-2, -1),
         ];
 
-        for offset_pos in offset_positions {
+        let mut positions = Vec::new();
+
+        for offset_pos in KNIGHT_OFFSETS {
             let check_pos = pos + offset_pos;
 
             if !check_pos.is_onboard() {
@@ -536,7 +524,7 @@ impl Default for Board {
 
 //==================================================
 //=== Step
-//==================================================
+//================= =================================
 
 type GroupID = i8;
 type UnitPos = Pos;
@@ -594,6 +582,14 @@ impl Step<ConditionState> {
         self.actions.push(StepAction {
             group_id: self.groups,
             command: Command::Move(unit_pos, target_pos),
+        })
+    }
+
+    /// Adds an [`StepAction`] to [`Step`], which moves the unit from `unit_pos` to `target_pos`
+    fn add_action_promote(&mut self, target_pos: Pos) {
+        self.actions.push(StepAction {
+            group_id: self.groups,
+            command: Command::Promote(target_pos),
         })
     }
 
@@ -707,7 +703,7 @@ impl Step<ConditionState> {
                 }
                 Test::NotKing => {
                     if !board.get_unit(&condition.pos).is_none() {
-                        if !matches!(board.get_unit(&condition.pos), Some(unit) if !eq_unit_type(&Unit::King(Side::Black, true), &unit))
+                        if !matches!(board.get_unit(&condition.pos), Some(unit) if !eq_unit_type(&Unit::KING, &unit))
                         {
                             group_valid = false;
                         }
@@ -734,7 +730,7 @@ struct ConditionState {
 }
 
 impl ConditionState {
-    /// Creates a mew [`ConditionState`] with empty `step_conditions`
+    /// Creates a new [`ConditionState`] with empty `step_conditions`
     fn new() -> Self {
         Self {
             step_conditions: Vec::new(),
@@ -839,6 +835,7 @@ struct StepAction {
 enum Command {
     Remove(UnitPos),
     Move(UnitPos, TargetPos),
+    Promote(TargetPos),
 }
 
 impl Command {
@@ -863,6 +860,7 @@ impl Command {
                     board.set_unit(unit.set_moved(true), *target_pos);
                 }
             }
+            Self::Promote(pos) => board.promote(*pos),
         }
 
         step_image

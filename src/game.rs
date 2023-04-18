@@ -20,7 +20,7 @@ pub struct Game {
 }
 
 impl Game {
-    /// Creates a new Chess Game
+    /// Creates a new Game
     pub fn new() -> Self {
         Game {
             game_state: GameState::Playing,
@@ -41,7 +41,6 @@ impl Game {
         self.current_turn
     }
 
-    // TODO! Promoting Pawns
     // TODO! Game Ending -> CheckMate/StaleMate
 
     /// Mutates the `board_state` + `current_turn` based on the value of `unit_pos` and `target_pos`

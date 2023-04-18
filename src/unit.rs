@@ -21,6 +21,14 @@ impl Unit {
     /// Number of different units (size and type matters)
     pub const UNIT_COUNT: usize = 12;
 
+    // Unit Types, use these if you don't care about `Side` or `Moved`
+    pub const PAWN: Unit = Unit::Pawn(Side::Black, false);
+    pub const BISHOP: Unit = Unit::Bishop(Side::Black);
+    pub const KNIGHT: Unit = Unit::Knight(Side::Black);
+    pub const ROOK: Unit = Unit::Rook(Side::Black, false);
+    pub const QUEEN: Unit = Unit::Queen(Side::Black);
+    pub const KING: Unit = Unit::King(Side::Black, false);
+
     /// Gives back the name of the [`Unit`]
     pub fn get_name(self) -> String {
         match self {
@@ -114,6 +122,18 @@ impl Unit {
             unit => *unit,
         }
     }
+
+    /// Change the current type of [`Unit`] to the type of `other_unit`
+    pub fn change_type(&self, other_unit: &Unit) -> Self {
+        match other_unit {
+            Unit::Pawn(_, _) => Unit::Pawn(self.get_side(), self.is_moved()),
+            Unit::Bishop(_) => Unit::Bishop(self.get_side()),
+            Unit::Knight(_) => Unit::Knight(self.get_side()),
+            Unit::Rook(_, _) => Unit::Rook(self.get_side(), self.is_moved()),
+            Unit::Queen(_) => Unit::Queen(self.get_side()),
+            Unit::King(_, _) => Unit::Pawn(self.get_side(), self.is_moved()),
+        }
+    }
 }
 
 /// Checks if the two [`Unit`]s are the same type
@@ -131,7 +151,7 @@ pub fn eq_unit_type(unit1: &Unit, unit2: &Unit) -> bool {
 
 impl fmt::Display for Unit {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let x = match self {
+        let unit_fmt = match self {
             Unit::Pawn(Side::Black, _) => "♟",
             Unit::Bishop(Side::Black) => "♝",
             Unit::Knight(Side::Black) => "♞",
@@ -145,7 +165,7 @@ impl fmt::Display for Unit {
             Unit::Queen(Side::White) => "♕",
             Unit::King(Side::White, _) => "♔",
         };
-        write!(f, "{}", x.to_owned())
+        write!(f, "{}", unit_fmt.to_owned())
     }
 }
 
