@@ -67,14 +67,14 @@ The pictures below show the calculations for each unit.
 
 Currently there are two examples to test out the system, one of them is using eGUI and the other one is using notan. Right now I'm more focused on notan, which I can gladly recommend to anyone, who wants to quickly implement and test out things in Rust.
 
-```bash
+```rust
 cargo run --example app_notan
 ```
 
 or
 
-```bash
-cargo run --example app_egui
+```rust
+cargo run --example app_egui --features egui
 ```
 
 ### TODO
