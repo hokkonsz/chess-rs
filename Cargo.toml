@@ -10,12 +10,12 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-eframe = {version = "0.21", optional = true}
-egui_extras = {version = "0.21", features = ["svg"], optional = true}
-notan = { version = "0.9", optional = true}
+eframe = {version = "0.25", optional = true}
+egui_extras = {version = "0.25", features = ["svg"], optional = true}
+notan = { version = "0.11", optional = true}
 
 [features]
-default = ["notan"]
+default = ["egui"]
 egui = ["dep:eframe", "dep:egui_extras"]
 notan = ["dep:notan"]
 

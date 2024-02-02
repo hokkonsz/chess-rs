@@ -64,13 +64,14 @@ pub struct ChessState {
 
 impl ChessState {
     pub fn run() -> Result<(), String> {
-        let win = WindowConfig::default()
-            .size(WIDTH as i32, HEIGHT as i32)
-            .high_dpi(true)
-            .lazy_loop(true);
+        let window_cfg = WindowConfig::default()
+            .set_title("Chess")
+            .set_size(WIDTH as u32, HEIGHT as u32)
+            .set_high_dpi(true)
+            .set_lazy_loop(true);
 
         notan::init_with(init)
-            .add_config(win)
+            .add_config(window_cfg)
             .add_config(DrawConfig)
             .update(update)
             .draw(draw)

@@ -1,13 +1,13 @@
+// Standard
+use std::{fs, path::Path};
+
 // Chess Crate
 extern crate chess;
 use chess::prelude::*;
 
 // UI Crate
-use eframe::egui::{Color32, Response, RichText};
-use eframe::epaint::Vec2;
-use eframe::{egui, App, NativeOptions};
-use egui_extras::image::FitTo;
-use egui_extras::RetainedImage;
+use eframe::egui::{Color32, Image, Response, RichText};
+use eframe::{egui, App};
 
 // SIZES
 const WIDTH: f32 = 1024.0;
@@ -23,70 +23,33 @@ fn main() {
     ChessEguiApp::run()
 }
 
+#[derive(Default)]
 pub struct ChessEguiApp {
     chess: Game,
-    img_buffer: Vec<RetainedImage>,
 }
 
 impl ChessEguiApp {
     pub fn new() -> Self {
-        Self {
-            chess: Game::new(),
-            img_buffer: ChessEguiApp::init(),
-        }
+        Self { chess: Game::new() }
     }
 
     pub fn run() {
-        let mut options = NativeOptions::default();
-        options.initial_window_size = Some(Vec2::new(WIDTH, HEIGHT));
-        options.resizable = false;
-        options.centered = true;
+        let options = eframe::NativeOptions {
+            viewport: egui::ViewportBuilder::default()
+                .with_inner_size([WIDTH, HEIGHT])
+                .with_title("Chess"),
+            centered: true,
+            ..Default::default()
+        };
 
-        eframe::run_native(
+        let _ = eframe::run_native(
             "Chess",
             options,
-            Box::new(|_cc| Box::new(ChessEguiApp::new())),
+            Box::new(|cc| {
+                egui_extras::install_image_loaders(&cc.egui_ctx);
+                Box::<ChessEguiApp>::default()
+            }),
         );
-    }
-
-    fn init() -> Vec<RetainedImage> {
-        let units: [Unit; Unit::UNIT_COUNT] = [
-            Unit::Pawn(Side::Black, false),
-            Unit::Bishop(Side::Black),
-            Unit::Knight(Side::Black),
-            Unit::Rook(Side::Black, false),
-            Unit::Queen(Side::Black),
-            Unit::King(Side::Black, false),
-            //=============
-            Unit::Pawn(Side::White, false),
-            Unit::Bishop(Side::White),
-            Unit::Knight(Side::White),
-            Unit::Rook(Side::White, false),
-            Unit::Queen(Side::White),
-            Unit::King(Side::White, false),
-        ];
-
-        let mut img_buffer = Vec::new();
-
-        for (i, unit) in units.into_iter().enumerate() {
-            let debug_name = format!("{}", unit.get_id_str());
-            let path = format!("examples/res/svg/{}.svg", unit.get_id_str());
-
-            img_buffer.push(
-                egui_extras::image::RetainedImage::from_svg_bytes_with_size(
-                    debug_name,
-                    std::fs::read(std::path::Path::new(&path))
-                        .unwrap()
-                        .as_slice(),
-                    FitTo::Size(SQUARE_SIZE as u32, SQUARE_SIZE as u32),
-                )
-                .unwrap(),
-            );
-
-            println!("Images loaded: {}/{}", i + 1, Unit::UNIT_COUNT);
-        }
-
-        img_buffer
     }
 }
 impl App for ChessEguiApp {
@@ -103,10 +66,11 @@ impl App for ChessEguiApp {
             .anchor(egui::Align2::CENTER_CENTER, [0.0, 10.0])
             .show(ctx, |ui| {
                 egui::Grid::new("BoardGrid")
-                    .min_col_width(SQUARE_SIZE + 7.0)
-                    .min_row_height(SQUARE_SIZE + 7.0)
+                    .min_col_width(SQUARE_SIZE + 13.0)
+                    .min_row_height(SQUARE_SIZE + 13.0)
                     .spacing((SPACING, SPACING))
                     .show(ui, |ui| {
+                        // Top Legend
                         ui.label("");
                         ui.label(RichText::new("       A").color(Color32::WHITE).size(18.0));
                         ui.label(RichText::new("       B").color(Color32::WHITE).size(18.0));
@@ -121,16 +85,28 @@ impl App for ChessEguiApp {
 
                         let mut row_num = 8;
                         for (y_pos, row) in self.chess.board_state.squares.into_iter().enumerate() {
+                            // Left Legend
                             let side = format!("   {}", row_num);
                             ui.label(RichText::new(side).color(Color32::WHITE).size(18.0));
                             row_num -= 1;
 
+                            // Board
                             for (x_pos, col) in row.into_iter().enumerate() {
                                 let response: Response;
                                 if let Some(unit) = col {
+                                    let uri = format!(
+                                        "bytes://examples/res/svg/{}.svg",
+                                        unit.get_id_str()
+                                    );
+
+                                    let bytes = fs::read(Path::new(&format!(
+                                        "examples/res/svg/{}.svg",
+                                        unit.get_id_str()
+                                    )))
+                                    .unwrap();
+
                                     response = ui.add(egui::ImageButton::new(
-                                        self.img_buffer[unit.get_id() as usize].texture_id(ctx),
-                                        (SQUARE_SIZE + 5.0, SQUARE_SIZE + 5.0),
+                                        egui::Image::from_bytes(uri, bytes),
                                     ));
                                 } else {
                                     response =

@@ -19,16 +19,22 @@ pub struct Game {
     pub target_pos: Option<Pos>,
 }
 
-impl Game {
-    /// Creates a new Game
-    pub fn new() -> Self {
-        Game {
+impl Default for Game {
+    fn default() -> Self {
+        Self {
             game_state: GameState::Playing,
             board_state: Board::new(),
             current_turn: Side::White,
             unit_pos: None,
             target_pos: None,
         }
+    }
+}
+
+impl Game {
+    /// Creates a new Game
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Gives back the current game state
