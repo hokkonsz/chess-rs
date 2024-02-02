@@ -82,4 +82,3 @@ cargo run --example app_egui --features egui
 List of missing features and future plans.
 
 * CheckMate / StaleMate
-* Promote Unit

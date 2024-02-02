@@ -31,32 +31,6 @@ impl Pos {
         &Self::right,
     ];
 
-    pub const DIAGNOAL: [&dyn Fn(&Self) -> Self; 4] = [
-        &Self::up_left,
-        &Self::up_right,
-        &Self::down_left,
-        &Self::down_right,
-    ];
-
-    pub const CROSS: [&dyn Fn(&Self) -> Self; 4] = [
-        &Self::up,
-        &Self::down,
-        &Self::left,
-        &Self::right, //
-    ];
-
-    pub const UPWARD: [&dyn Fn(&Self) -> Self; 3] = [
-        &Self::up,
-        &Self::up_left,
-        &Self::up_right, //
-    ];
-
-    pub const DOWNWARD: [&dyn Fn(&Self) -> Self; 3] = [
-        &Self::down,
-        &Self::down_left,
-        &Self::down_right, //
-    ];
-
     /// Creates a new [`Pos`] if x and y is on the board
     ///
     /// Panics when...

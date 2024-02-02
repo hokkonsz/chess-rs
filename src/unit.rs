@@ -18,7 +18,7 @@ pub enum Unit {
 pub type Moved = bool;
 
 impl Unit {
-    /// Number of different units (size and type matters)
+    /// Number of different units (color matters)
     pub const UNIT_COUNT: usize = 12;
 
     // Unit Types, use these if you don't care about `Side` or `Moved`
@@ -32,12 +32,12 @@ impl Unit {
     /// Gives back the name of the [`Unit`]
     pub fn get_name(self) -> String {
         match self {
-            Self::Pawn(_, _) => String::from("Pawn"),
-            Self::Bishop(_) => String::from("Bishop"),
-            Self::Knight(_) => String::from("Knight"),
-            Self::Rook(_, _) => String::from("Rook"),
-            Self::Queen(_) => String::from("Queen"),
-            Self::King(_, _) => String::from("King"),
+            Self::Pawn(..) => String::from("Pawn"),
+            Self::Bishop(..) => String::from("Bishop"),
+            Self::Knight(..) => String::from("Knight"),
+            Self::Rook(..) => String::from("Rook"),
+            Self::Queen(..) => String::from("Queen"),
+            Self::King(..) => String::from("King"),
         }
     }
 
@@ -126,12 +126,12 @@ impl Unit {
     /// Change the current type of [`Unit`] to the type of `other_unit`
     pub fn change_type(&self, other_unit: &Unit) -> Self {
         match other_unit {
-            Unit::Pawn(_, _) => Unit::Pawn(self.get_side(), self.is_moved()),
-            Unit::Bishop(_) => Unit::Bishop(self.get_side()),
-            Unit::Knight(_) => Unit::Knight(self.get_side()),
-            Unit::Rook(_, _) => Unit::Rook(self.get_side(), self.is_moved()),
-            Unit::Queen(_) => Unit::Queen(self.get_side()),
-            Unit::King(_, _) => Unit::Pawn(self.get_side(), self.is_moved()),
+            Unit::Pawn(..) => Unit::Pawn(self.get_side(), self.is_moved()),
+            Unit::Bishop(..) => Unit::Bishop(self.get_side()),
+            Unit::Knight(..) => Unit::Knight(self.get_side()),
+            Unit::Rook(..) => Unit::Rook(self.get_side(), self.is_moved()),
+            Unit::Queen(..) => Unit::Queen(self.get_side()),
+            Unit::King(..) => Unit::Pawn(self.get_side(), self.is_moved()),
         }
     }
 }
@@ -139,12 +139,12 @@ impl Unit {
 /// Checks if the two [`Unit`]s are the same type
 pub fn eq_unit_type(unit1: &Unit, unit2: &Unit) -> bool {
     match (unit1, unit2) {
-        (Unit::Pawn(_, _), Unit::Pawn(_, _)) => true,
-        (Unit::Bishop(_), Unit::Bishop(_)) => true,
-        (Unit::Knight(_), Unit::Knight(_)) => true,
-        (Unit::Rook(_, _), Unit::Rook(_, _)) => true,
-        (Unit::Queen(_), Unit::Queen(_)) => true,
-        (Unit::King(_, _), Unit::King(_, _)) => true,
+        (Unit::Pawn(..), Unit::Pawn(..)) => true,
+        (Unit::Bishop(..), Unit::Bishop(..)) => true,
+        (Unit::Knight(..), Unit::Knight(..)) => true,
+        (Unit::Rook(..), Unit::Rook(..)) => true,
+        (Unit::Queen(..), Unit::Queen(..)) => true,
+        (Unit::King(..), Unit::King(..)) => true,
         _ => false,
     }
 }

@@ -1,8 +1,58 @@
+use std::ops::Add;
+
 // Chess Crate
 use super::pos::Pos;
 use super::unit::*;
 
 const BOARD_SIZE: usize = 8;
+
+const ALL_DIRECTION_OFFSETS: [Pos; 8] = [
+    Pos::new(0, 1),
+    Pos::new(1, 1),
+    Pos::new(1, 0),
+    Pos::new(1, -1),
+    Pos::new(0, -1),
+    Pos::new(-1, -1),
+    Pos::new(-1, 0),
+    Pos::new(-1, 1),
+];
+
+const DIAGONAL_OFFSETS: [Pos; 4] = [
+    Pos::new(1, 1),
+    Pos::new(1, -1),
+    Pos::new(-1, -1),
+    Pos::new(-1, 1),
+];
+
+const CROSS_OFFSETS: [Pos; 4] = [
+    Pos::new(0, 1),
+    Pos::new(0, -1),
+    Pos::new(1, 0),
+    Pos::new(-1, 0),
+];
+
+const UPWARD_OFFSETS: [Pos; 3] = [
+    Pos::new(0, 1),
+    Pos::new(1, 1),
+    Pos::new(-1, 1), //
+];
+
+const DOWNWARD_OFFSETS: [Pos; 3] = [
+    Pos::new(0, -1),
+    Pos::new(1, -1),
+    Pos::new(-1, -1), //
+];
+
+const KNIGHT_OFFSETS: [Pos; 8] = [
+    Pos::new(-2, 1),
+    Pos::new(-1, 2),
+    Pos::new(1, 2),
+    Pos::new(2, 1),
+    Pos::new(2, -1),
+    Pos::new(1, -2),
+    Pos::new(-1, -2),
+    Pos::new(-2, -1),
+];
 
 //==================================================
 //=== Board
@@ -91,6 +141,8 @@ impl Board {
 
     /// Mutates [`Board`] when called with a viable step
     pub fn test_step(&mut self, unit_pos: &Pos, target_pos: &Pos) -> bool {
+        // Any Valid Step Available -> Same Side
+
         // Check Step
         let selected_unit = self.get_unit(unit_pos).unwrap();
         let step = self.step_unit(&selected_unit, unit_pos, target_pos);
@@ -111,6 +163,8 @@ impl Board {
             println!("Can't move into check! / Can't move when checeked!");
             return false;
         }
+
+        // Any Valid Step Available -> Other Side
 
         true
     }
@@ -294,7 +348,7 @@ impl Board {
             step.add_cond_pos_not_king(*target_pos);
 
             step.add_action_move(*unit_pos, *target_pos);
-        } else if calc_pos.y == 0 {
+        } else if calc_pos.y == 0 && !self.test_checked_status(side) {
             // Castle Left E.g. E1 -> C1
             if calc_pos.x == -2 && !moved {
                 step.set(true);
@@ -334,16 +388,17 @@ impl Board {
         }
         let king_pos = king_pos.unwrap();
 
-        // Directions
+        // Find Units All Direction
         for direction in Pos::ALL_DIRECTIONS {
             if let Some(pos) = self.find_unit_direction(king_pos, direction) {
                 positions.push(pos)
             }
         }
 
-        // Knights
+        // Find Knights
         positions.extend(self.find_knights(king_pos));
 
+        // Filter Friendly Units
         positions = positions
             .into_iter()
             .filter(|pos| self.get_unit(pos).unwrap().get_side() != *side)
@@ -389,17 +444,6 @@ impl Board {
     ///
     /// Returns a vector, which contains all of the Knights found
     fn find_knights(&self, pos: Pos) -> Vec<Pos> {
-        const KNIGHT_OFFSETS: [Pos; 8] = [
-            Pos::new(-2, 1),
-            Pos::new(-1, 2),
-            Pos::new(1, 2),
-            Pos::new(2, 1),
-            Pos::new(2, -1),
-            Pos::new(1, -2),
-            Pos::new(-1, -2),
-            Pos::new(-2, -1),
-        ];
-
         let mut positions = Vec::new();
 
         for offset_pos in KNIGHT_OFFSETS {
@@ -419,7 +463,7 @@ impl Board {
         positions
     }
 
-    /// Returns true if the [`Unit`] checks the King
+    /// Returns true if the `unit` checks the King
     fn test_checking(&self, unit: &Unit, unit_pos: &Pos, king_pos: &Pos) -> bool {
         let calc_pos = (*king_pos - *unit_pos).abs();
         let mut valid_check = false;
@@ -467,6 +511,55 @@ impl Board {
         }
 
         valid_check
+    }
+
+    ///
+    fn test_valid_step_available(&self, side: &Side) -> bool {
+        let valid_step = false;
+        let check_rows: [i8; 8] = match side {
+            Side::Black => [1, 0, 2, 3, 4, 5, 6, 7],
+            Side::White => [6, 7, 1, 2, 3, 4, 5, 6],
+        };
+
+        for y in check_rows {
+            for x in 0..8i8 {
+                let unit_pos = Pos::new(x, y);
+                let unit = self.get_unit(&unit_pos);
+
+                if unit.is_none() {
+                    continue;
+                }
+
+                let unit = unit.unwrap();
+                if unit.get_side() != *side {
+                    continue;
+                }
+
+                let offsets = match unit {
+                    Unit::Pawn(side, _) => match side {
+                        Side::Black => DOWNWARD_OFFSETS.as_ref(),
+                        Side::White => UPWARD_OFFSETS.as_ref(),
+                    },
+                    Unit::Bishop(..) => DIAGONAL_OFFSETS.as_ref(),
+                    Unit::Knight(..) => KNIGHT_OFFSETS.as_ref(),
+                    Unit::Rook(..) => CROSS_OFFSETS.as_ref(),
+                    _ => ALL_DIRECTION_OFFSETS.as_ref(),
+                };
+
+                for offset in offsets {
+                    let target_pos = unit_pos + *offset;
+
+                    // Pos Not On Board -> Continue
+                    if !target_pos.is_onboard() {
+                        continue;
+                    }
+
+                    let step = self.step_unit(&unit, &unit_pos, &target_pos);
+                }
+            }
+        }
+
+        valid_step
     }
 }
 
